@@ -22,16 +22,17 @@ npm install @jsilvanus/chattydeer
 ```js
 import { Explainer } from '@jsilvanus/chattydeer';
 
-const explainer = await Explainer.create('llama-3.2-3b', { deterministic: true });
+const explainer = await Explainer.create('llama-3.2-3b', { deterministic: true }); // deterministic: stable, reproducible outputs (useful for tests)
 
 const result = await explainer.explain({
-  task: 'narrate',
-  domain: 'evolution',
-  context: { filePath: 'src/auth/handler.ts' },
+  task: 'narrate',                     // intent: what you want the explainer to produce (e.g. 'summarize', 'narrate')
+  domain: 'evolution',                 // domain helps choose domain-specific phrasing or templates
+  context: { filePath: 'src/auth/handler.ts' }, // optional contextual metadata (file path, URL, etc.)
   evidence: [
+    // Evidence items: structured blocks the explainer will reason over
     { id: 1, source: 'src/auth/handler.ts', excerpt: '2024-03-15 *** LARGE CHANGE' },
   ],
-  maxTokens: 256,
+  maxTokens: 256,                       // limit the response length (tokens)
 });
 
 console.log(result.explanation); // "The auth handler underwent a major rewrite..."
