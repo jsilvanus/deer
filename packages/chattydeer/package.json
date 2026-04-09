@@ -19,6 +19,7 @@
     "prepare": "pnpm run build && pnpm run build:types",
     "prepublishOnly": "pnpm run build && pnpm run build:types",
     "test": "pnpm run build && node --test test/*.test.js",
+    "cli": "pnpm run build && node ./dist/cli.js",
     "coverage": "pnpm run build && c8 node --test test/*.test.js"
   },
   "repository": {
