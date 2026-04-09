@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { LLMAdapter } from '../src/llm-adapter.js';
+import { LLMAdapter } from '../dist/llm-adapter.js';
 
 test('LLMAdapter.destroy forwards to pool.destroy when pool present', async () => {
   let destroyed = false;

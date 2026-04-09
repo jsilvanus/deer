@@ -1,12 +1,8 @@
 /**
  * Minimal explainer templates used by the Explainer class.
- *
- * This module provides a small set of domain preludes. Tests only require
- * a working `renderTemplate(domain, vars)` function; richer domain
- * templates can be added later.
  */
 
-const TEMPLATES = {
+const TEMPLATES: Record<string, string> = {
   general: 'You are an expert explainer. Provide a concise, factual explanation using only provided evidence.',
   evolution: 'Explain code changes and their consequences concisely, using only the evidence blocks below.',
   security: 'Analyze the evidence for security implications, vulnerabilities, and mitigations.',
@@ -22,7 +18,7 @@ const TEMPLATES = {
   architecture: 'Describe high-level architecture and component interactions using the evidence.',
 };
 
-export function renderTemplate(domain, vars = {}) {
+export function renderTemplate(domain: string | undefined, vars: Record<string, unknown> = {}) {
   if (!domain) return TEMPLATES.general;
   const key = String(domain).toLowerCase();
   return TEMPLATES[key] || TEMPLATES.general;

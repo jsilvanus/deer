@@ -1,18 +1,8 @@
 /**
  * runAgentLoop — execute an agentic tool-calling loop using a ChatCompletionProvider.
- *
- * Options:
- *  - provider: ChatCompletionProvider (required)
- *  - tools: ToolDefinition[] (optional)
- *  - executeTool: async (name, args, callId) => string (required)
- *  - maxRoundtrips: number (default 5)
- *  - maxTokens: number
- *  - temperature: number
- *  - onMessage: (msg) => void
- *  - redactContent: (text) => string  // optional hook; used to redact messages before sending
  */
 
-export async function runAgentLoop(session, opts = {}) {
+export async function runAgentLoop(session: any, opts: any = {}) {
   const {
     provider,
     tools = [],
@@ -30,9 +20,8 @@ export async function runAgentLoop(session, opts = {}) {
   let roundtrips = 0;
 
   while (roundtrips < maxRoundtrips) {
-    // Build redacted snapshot of session messages
     const srcMessages = Array.isArray(session.history) ? session.history : (typeof session.history === 'function' ? session.history() : session.history);
-    const redacted = (Array.isArray(srcMessages) ? srcMessages : []).map((m) => {
+    const redacted = (Array.isArray(srcMessages) ? srcMessages : []).map((m: any) => {
       const content = String(m.content ?? '');
       return { role: m.role, content: typeof redactContent === 'function' ? redactContent(content) : content, toolName: m.toolName };
     });
@@ -40,19 +29,16 @@ export async function runAgentLoop(session, opts = {}) {
     const resp = await provider.complete({ session: { messages: redacted }, tools, maxTokens, temperature });
     const message = resp.message ?? { role: 'assistant', content: '' };
 
-    // If provider asked for tool calls
     const toolCalls = Array.isArray(message.toolCalls) ? message.toolCalls : null;
     if (toolCalls && toolCalls.length > 0) {
-      // Append assistant message that requested tool calls
       session.append({ role: 'assistant', content: String(message.content ?? ''), toolCalls });
       if (typeof onMessage === 'function') onMessage({ role: 'assistant', content: String(message.content ?? ''), toolCalls });
 
-      // Execute each requested tool and append tool results
       for (const call of toolCalls) {
-        let result;
+        let result: any;
         try {
           result = await executeTool(call.name, call.arguments ?? {}, call.id);
-        } catch (err) {
+        } catch (err: any) {
           result = `Error executing tool "${call.name}": ${err && err.message ? err.message : String(err)}`;
         }
         session.append({ role: 'tool', content: String(result ?? ''), toolName: call.name });
@@ -60,10 +46,9 @@ export async function runAgentLoop(session, opts = {}) {
       }
 
       roundtrips++;
-      continue; // ask provider again with updated history
+      continue;
     }
 
-    // No tool calls → final answer
     const final = String(message.content ?? '');
     session.append({ role: 'assistant', content: final });
     if (typeof onMessage === 'function') onMessage({ role: 'assistant', content: final });

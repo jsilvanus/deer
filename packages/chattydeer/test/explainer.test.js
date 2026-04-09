@@ -1,6 +1,6 @@
 import { strict as assert } from 'assert';
 import test from 'node:test';
-import { Explainer } from '../src/explainer.js';
+import { Explainer } from '../dist/explainer.js';
 
 test('parses valid JSON output from adapter', async () => {
   const mockAdapter = {

@@ -1,6 +1,6 @@
 import { randomUUID } from 'crypto';
 
-function _extractMessagesFromSession(sessionLike) {
+function _extractMessagesFromSession(sessionLike: any) {
   if (!sessionLike) return [];
   if (Array.isArray(sessionLike.messages)) return sessionLike.messages;
   if (Array.isArray(sessionLike.history)) return sessionLike.history;
@@ -9,7 +9,7 @@ function _extractMessagesFromSession(sessionLike) {
   return [];
 }
 
-function _mapToOpenAiMessages(messages) {
+function _mapToOpenAiMessages(messages: any[]) {
   return messages.map((m) => {
     const role = m.role === 'tool' ? 'system' : m.role;
     const content = m.content ?? '';
@@ -17,12 +17,12 @@ function _mapToOpenAiMessages(messages) {
   });
 }
 
-export function createChatProvider(httpUrl, model, apiKey) {
+export function createChatProvider(httpUrl: string | undefined, model: string, apiKey?: string) {
   const base = String(httpUrl || '').replace(/\/$/, '');
   const endpoint = base + '/v1/chat/completions';
 
-  async function _doFetch(body, stream = false) {
-    const headers = { 'Content-Type': 'application/json' };
+  async function _doFetch(body: any, stream = false) {
+    const headers: any = { 'Content-Type': 'application/json' };
     if (apiKey) headers['Authorization'] = `Bearer ${apiKey}`;
     const res = await fetch(endpoint, {
       method: 'POST',
@@ -37,16 +37,16 @@ export function createChatProvider(httpUrl, model, apiKey) {
   }
 
   return {
-    async complete(req = {}) {
+    async complete(req: any = {}) {
       const tools = Array.isArray(req.tools) ? req.tools : [];
       const sessionLike = req.session;
 
       const srcMessages = _extractMessagesFromSession(sessionLike);
       const messages = _mapToOpenAiMessages(srcMessages);
 
-      const functions = tools.map((t) => ({ name: t.name, description: t.description, parameters: t.parameters ?? {} }));
+      const functions = tools.map((t: any) => ({ name: t.name, description: t.description, parameters: t.parameters ?? {} }));
 
-      const body = {
+      const body: any = {
         model,
         messages,
         temperature: typeof req.temperature === 'number' ? req.temperature : undefined,
@@ -54,10 +54,10 @@ export function createChatProvider(httpUrl, model, apiKey) {
       };
       if (functions.length > 0) body.functions = functions;
 
-      let json;
+      let json: any;
       try {
         json = await _doFetch(body, false);
-      } catch (err) {
+      } catch (err: any) {
         return { message: { role: 'assistant', content: `Error: ${err.message}` }, tokensUsed: 0, finishReason: 'error' };
       }
 
@@ -70,16 +70,14 @@ export function createChatProvider(httpUrl, model, apiKey) {
 
       const msg = choice.message ?? {};
       let content = String(msg.content ?? '');
-      let toolCalls = null;
+      let toolCalls: any = null;
 
-      // OpenAI-style function_call handling
       if (msg.function_call && msg.function_call.name) {
         const argsRaw = msg.function_call.arguments ?? '{}';
-        let parsedArgs = {};
+        let parsedArgs: any = {};
         try { parsedArgs = JSON.parse(argsRaw); } catch { parsedArgs = { raw: argsRaw }; }
         toolCalls = [{ id: randomUUID(), name: msg.function_call.name, arguments: parsedArgs }];
       } else {
-        // Try to parse embedded JSON that may contain toolCalls
         try {
           const parsed = JSON.parse(content);
           if (parsed && Array.isArray(parsed.toolCalls)) toolCalls = parsed.toolCalls;
@@ -90,14 +88,14 @@ export function createChatProvider(httpUrl, model, apiKey) {
 
       const finishReason = choice.finish_reason ?? (toolCalls ? 'tool_calls' : 'stop');
 
-      const responseMessage = { role: 'assistant', content };
+      const responseMessage: any = { role: 'assistant', content };
       if (toolCalls) responseMessage.toolCalls = toolCalls;
 
       return { message: responseMessage, tokensUsed: usage, finishReason };
     },
 
-    async *stream(req = {}) {
-      const res = await this.complete(req);
+    async *stream(req: any = {}) {
+      const res = await (this as any).complete(req);
       yield { delta: String(res.message.content ?? ''), done: true };
     },
 

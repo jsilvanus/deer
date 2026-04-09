@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { Explainer } from '../src/explainer.js';
+import { Explainer } from '../dist/explainer.js';
 
 test('Explainer.destroy forwards to adapter.destroy', async () => {
   let destroyed = false;

@@ -1,32 +1,5 @@
 /**
  * ChatSession — multi-turn conversation object with agentic tool-call loop.
- *
- * Supports an agentic loop where the LLM can request tool executions via
- * structured JSON responses, enabling gitsema's guide interactive chat:
- *
- *   User asks a question.
- *   → LLM decides which tools to call (e.g. semantic_search, recent_commits).
- *   → ChatSession executes the tool calls and feeds results back.
- *   → Repeat until the LLM returns a plain-text final answer.
- *
- * @example
- * const session = await ChatSession.create('llama-3.2-3b', {
- *   systemPrompt: 'You are a gitsema guide assistant.',
- *   tools: [
- *     { name: 'semantic_search', description: 'Search the codebase semantically.',
- *       parameters: { type: 'object', properties: { query: { type: 'string' } }, required: ['query'] } },
- *   ],
- * });
- *
- * const answer = await session.send('Which files handle authentication?', {
- *   executeTool: async (name, args) => {
- *     if (name === 'semantic_search') return mySearch(args.query);
- *     throw new Error(`Unknown tool: ${name}`);
- *   },
- * });
- *
- * console.log(answer);
- * await session.destroy();
  */
 
 import LLMAdapter from './llm-adapter.js';
@@ -37,72 +10,46 @@ import LLMAdapter from './llm-adapter.js';
  * @typedef ChatMessage
  * @property {'system'|'user'|'assistant'|'tool'} role
  * @property {string} content
- * @property {string} [toolName]     - Present when role='tool'
- * @property {ToolCall[]} [toolCalls] - Present when role='assistant' and tool calls were requested
+ * @property {string} [toolName]
+ * @property {ToolCall[]} [toolCalls]
  */
 
 export class ChatSession {
-  /**
-   * Create a ChatSession bound to a model or adapter.
-   *
-   * @param {string} modelName
-   * @param {object} [opts]
-   * @param {ToolDefinition[]} [opts.tools]        - Tool definitions available to the LLM.
-   * @param {string} [opts.systemPrompt]           - System-level instruction for the session.
-   * @param {object} [opts.adapter]                - Pre-built LLMAdapter instance (skips model load).
-   * @param {Function} [opts.generateFn]           - Custom generate function (for testing).
-   * @param {boolean} [opts.deterministic]         - Use deterministic (greedy) generation. Default: true.
-   */
-  static async create(modelName, opts = {}) {
+  adapter: any;
+  tools: any[];
+  _history: any[];
+  static async create(modelName: string, opts: any = {}) {
     const { tools = [], systemPrompt = '', adapter, ...adapterOpts } = opts;
 
     const llmAdapter = adapter ?? await LLMAdapter.create(modelName, adapterOpts);
     return new ChatSession(llmAdapter, { tools, systemPrompt });
   }
 
-  /**
-   * @param {object} adapter           - LLMAdapter instance (must implement `generate`).
-   * @param {object} [opts]
-   * @param {ToolDefinition[]} [opts.tools]
-   * @param {string} [opts.systemPrompt]
-   */
-  constructor(adapter, { tools = [], systemPrompt = '' } = {}) {
+  constructor(adapter: any, { tools = [], systemPrompt = '' }: any = {}) {
     if (!adapter || typeof adapter.generate !== 'function') {
       throw new Error('adapter must implement generate(prompt, opts)');
     }
     this.adapter = adapter;
     this.tools = Array.isArray(tools) ? tools : [];
-    this._history = /** @type {ChatMessage[]} */ ([]);
+    this._history = [];
 
     if (systemPrompt) {
       this._history.push({ role: 'system', content: systemPrompt });
     }
   }
 
-  /**
-   * The full conversation history (immutable snapshot).
-   * @returns {ChatMessage[]}
-   */
   get history() {
     return [...this._history];
   }
 
-  /**
-   * Append a ChatMessage to the session history.
-   * @param {{role: string, content: string, toolName?: string, toolCalls?: any[]}} msg
-   */
-  append(msg) {
+  append(msg: any) {
     if (!msg || typeof msg !== 'object' || !msg.role) throw new Error('append requires a message with a role');
-    const entry = { role: msg.role, content: String(msg.content ?? '' ) };
+    const entry: any = { role: msg.role, content: String(msg.content ?? '' ) };
     if (msg.toolName) entry.toolName = msg.toolName;
     if (msg.toolCalls) entry.toolCalls = Array.isArray(msg.toolCalls) ? msg.toolCalls : [];
     this._history.push(entry);
   }
 
-  /**
-   * Build a text prompt from the current conversation history and tool definitions.
-   * @returns {string}
-   */
   _buildPrompt() {
     let toolsSection = '';
     if (this.tools.length > 0) {
@@ -114,7 +61,7 @@ export class ChatSession {
         'When you have your final answer (no more tool calls needed), respond with plain text.';
     }
 
-    const lines = this._history.map((m) => {
+    const lines = this._history.map((m: any) => {
       switch (m.role) {
         case 'system':    return `System: ${m.content}`;
         case 'user':      return `User: ${m.content}`;
@@ -127,16 +74,9 @@ export class ChatSession {
     return lines.join('\n') + toolsSection + '\nAssistant:';
   }
 
-  /**
-   * Parse an assistant response to detect tool-call JSON vs a plain final answer.
-   *
-   * @param {string} text
-   * @returns {{ toolCalls: ToolCall[]|null, finalAnswer: string|null }}
-   */
-  _parseResponse(text) {
+  _parseResponse(text: string) {
     const trimmed = text.trim();
 
-    // Fast path: direct JSON parse
     try {
       const parsed = JSON.parse(trimmed);
       if (parsed && Array.isArray(parsed.toolCalls) && parsed.toolCalls.length > 0) {
@@ -146,13 +86,11 @@ export class ChatSession {
       // not pure JSON — try to extract an embedded JSON object
     }
 
-    // Walk through the text looking for balanced { } blocks that contain toolCalls.
     let searchFrom = 0;
     while (searchFrom < trimmed.length) {
       const start = trimmed.indexOf('{', searchFrom);
       if (start === -1) break;
 
-      // Find the matching closing brace by tracking depth
       let depth = 0;
       let end = -1;
       for (let i = start; i < trimmed.length; i++) {
@@ -163,7 +101,7 @@ export class ChatSession {
         }
       }
 
-      if (end === -1) break; // unbalanced — no point continuing
+      if (end === -1) break;
 
       const candidate = trimmed.slice(start, end + 1);
       try {
@@ -181,19 +119,7 @@ export class ChatSession {
     return { toolCalls: null, finalAnswer: text };
   }
 
-  /**
-   * Send a user message and run the agentic loop until a final answer is returned.
-   *
-   * @param {string} userMessage
-   * @param {object} [opts]
-   * @param {Function} [opts.executeTool]  - `async (name, args, callId) => result`
-   *   Called for each tool call the LLM requests. Must return a string or
-   *   value coercible to string. May throw; errors are forwarded to the LLM.
-   * @param {number} [opts.maxIterations]  - Maximum agentic loop iterations. Default: 10.
-   * @param {number} [opts.maxTokens]      - Max tokens per LLM call. Default: 512.
-   * @returns {Promise<string>} The LLM's final plain-text answer.
-   */
-  async send(userMessage, { executeTool, maxIterations = 10, maxTokens = 512 } = {}) {
+  async send(userMessage: string, { executeTool, maxIterations = 10, maxTokens = 512 } : any = {}) {
     this._history.push({ role: 'user', content: String(userMessage) });
 
     for (let iteration = 0; iteration < maxIterations; iteration++) {
@@ -204,32 +130,24 @@ export class ChatSession {
       const { toolCalls, finalAnswer } = this._parseResponse(rawText);
 
       if (finalAnswer !== null) {
-        // LLM produced a plain-text answer — record it and return
         this._history.push({ role: 'assistant', content: finalAnswer });
         return finalAnswer;
       }
 
-      // LLM wants to call tools
       this._history.push({ role: 'assistant', content: rawText, toolCalls: toolCalls ?? [] });
 
       if (typeof executeTool !== 'function' || toolCalls.length === 0) {
-        // No executor provided — treat raw response as final answer
         return rawText;
       }
 
-      // Execute each requested tool and append results to history
       for (const call of toolCalls) {
-        let result;
+        let result: any;
         try {
           result = await executeTool(call.name, call.arguments ?? {}, call.id);
-        } catch (err) {
-          result = `Error executing tool "${call.name}": ${err.message}`;
+        } catch (err: any) {
+          result = `Error executing tool \"${call.name}\": ${err.message}`;
         }
-        this._history.push({
-          role: 'tool',
-          content: String(result),
-          toolName: call.name,
-        });
+        this._history.push({ role: 'tool', content: String(result), toolName: call.name });
       }
     }
 
@@ -238,9 +156,6 @@ export class ChatSession {
     );
   }
 
-  /**
-   * Clean up underlying adapter resources (worker pools, pipelines).
-   */
   async destroy() {
     if (this.adapter && typeof this.adapter.destroy === 'function') {
       await this.adapter.destroy();

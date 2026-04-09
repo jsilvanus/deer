@@ -3,7 +3,7 @@ import Explainer from './explainer.js';
 
 const mockAdapter = {
   modelName: 'mock-cli',
-  generate: async (prompt, opts) => {
+  generate: async (prompt: string, opts: any) => {
     return { text: JSON.stringify({
       explanation: 'CLI demo explanation [1]',
       labels: [],
