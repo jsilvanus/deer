@@ -3,6 +3,9 @@
   "version": "0.2.0",
   "description": "A Node.js minimal LLM chat completionist — wraps embedeer with Explainer and LLM adapter capabilities",
   "main": "src/index.js",
+  "bin": {
+    "chattydeer": "src/cli.js"
+  },
   "files": [
     "assets",
     "src",
