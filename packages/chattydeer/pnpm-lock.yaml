@@ -12,8 +12,8 @@ importers:
         specifier: ^4.0.1
         version: 4.0.1
       '@jsilvanus/embedeer':
-        specifier: file:../embedeer
-        version: file:../embedeer
+        specifier: 1.3.1
+        version: 1.3.1
     devDependencies:
       c8:
         specifier: ^8.0.1
@@ -204,8 +204,8 @@ packages:
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
 
-  '@jsilvanus/embedeer@file:../embedeer':
-    resolution: {directory: ../embedeer, type: directory}
+  '@jsilvanus/embedeer@1.3.1':
+    resolution: {integrity: sha512-5jOImrV30+S0p5dUjiGHOXP6tZq3iWhaOsfv1awczJJlouWtzR33buUVTa7oTNuL/juUzvA+JFqLNlExj3Un5g==}
     engines: {node: '>=18'}
     hasBin: true
 
@@ -700,7 +700,7 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
 
-  '@jsilvanus/embedeer@file:../embedeer':
+  '@jsilvanus/embedeer@1.3.1':
     dependencies:
       '@huggingface/transformers': 4.0.1
 
