@@ -6,7 +6,7 @@
 
 A Node.js minimal LLM chat completionist built on top of [@jsilvanus/embedeer](https://github.com/jsilvanus/embedeer).
 
-Provides `Explainer`, `LLMAdapter`, and prompt utilities for structured LLM-based explanation and narration tasks.
+Provides `Explainer`, `LLMAdapter`, `ChatSession`, and prompt utilities for structured LLM-based explanation, narration, and agentic tool-calling tasks.
 
 ## Install
 
@@ -15,6 +15,8 @@ npm install @jsilvanus/chattydeer
 ```
 
 ## Usage
+
+### Single-turn explanation
 
 ```js
 import { Explainer } from '@jsilvanus/chattydeer';
@@ -35,16 +37,90 @@ console.log(result.explanation); // "The auth handler underwent a major rewrite.
 await explainer.destroy();
 ```
 
+### Multi-turn chat with function calling (agentic loop)
+
+```js
+import { ChatSession } from '@jsilvanus/chattydeer';
+
+const session = await ChatSession.create('llama-3.2-3b', {
+  systemPrompt: 'You are a gitsema guide assistant. Use tools to answer questions.',
+  tools: [
+    {
+      name: 'semantic_search',
+      description: 'Search the codebase semantically by natural-language query.',
+      parameters: {
+        type: 'object',
+        properties: { query: { type: 'string' } },
+        required: ['query'],
+      },
+    },
+    {
+      name: 'recent_commits',
+      description: 'Return the N most recent commits touching a file.',
+      parameters: {
+        type: 'object',
+        properties: {
+          filePath: { type: 'string' },
+          n:        { type: 'number' },
+        },
+        required: ['filePath'],
+      },
+    },
+  ],
+});
+
+// The session runs an agentic loop:
+//   LLM requests tool calls → ChatSession executes them → results fed back → repeat
+const answer = await session.send('Which files changed most in the last month?', {
+  executeTool: async (name, args) => {
+    if (name === 'semantic_search')  return mySearch(args.query);
+    if (name === 'recent_commits')   return myCommits(args.filePath, args.n);
+    throw new Error(`Unknown tool: ${name}`);
+  },
+  maxIterations: 10, // safeguard against infinite loops
+});
+
+console.log(answer);
+
+// Continue the conversation in the same session
+const followUp = await session.send('Can you summarise the top file in one sentence?', {
+  executeTool: async (name, args) => { /* ... */ },
+});
+
+await session.destroy();
+```
+
 ## API
 
+### `Explainer`
+
 - `Explainer.create(modelName, opts)` — create an explainer bound to a model
-- `explainer.explain(request)` — explain using structured evidence blocks
+- `explainer.explain(request)` — explain using structured evidence blocks; returns `{ explanation, labels, references, meta }`
+- `explainer.destroy()` — release underlying resources
+
+### `ChatSession`
+
+- `ChatSession.create(modelName, opts)` — create a session; accepts `tools`, `systemPrompt`, `adapter`
+- `session.send(userMessage, opts)` — send a message and run the agentic tool-call loop; returns a final plain-text answer
+  - `opts.executeTool` — `async (name, args, callId) => result` — called for each tool the LLM requests
+  - `opts.maxIterations` — loop guard (default `10`)
+  - `opts.maxTokens` — tokens per LLM call (default `512`)
+- `session.history` — read-only snapshot of all `ChatMessage` objects in the conversation
+- `session.destroy()` — release underlying resources
+
+### `LLMAdapter`
+
 - `LLMAdapter.create(modelName, opts)` — low-level text-generation adapter
+- `adapter.generate(prompt, opts)` — returns `{ text, raw, meta }`
+- `adapter.destroy()` — release underlying resources
+
+### Utilities
+
 - `explainForGitsema(payload, opts)` — gitsema-compatible adapter
 - `renderTemplate(domain, vars)` — render a domain-specific prompt template
 - `estimateTokensFromChars(chars)` / `trimEvidenceForBudget(prelude, evidence, budget)` — prompt utilities
 
-See [explainer-contract.md](./explainer-contract.md) for the full interface contract.
+See [explainer-contract.md](./explainer-contract.md) for the full Explainer interface contract.
 
 ## License
 
