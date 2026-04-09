@@ -4,7 +4,7 @@
   "description": "A Node.js minimal LLM chat completionist — wraps embedeer with Explainer and LLM adapter capabilities",
   "main": "src/index.js",
   "files": [
-    "assets"
+    "assets",
     "src",
     "README.md",
     "explainer-contract.md"
