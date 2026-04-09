@@ -1,6 +1,6 @@
 {
   "name": "@jsilvanus/chattydeer",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "A Node.js minimal LLM chat completionist — wraps embedeer with Explainer and LLM adapter capabilities",
   "main": "src/index.js",
   "bin": {
