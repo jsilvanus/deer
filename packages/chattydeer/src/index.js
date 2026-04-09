@@ -38,3 +38,6 @@ export { ChatSession } from './chat-session.js';
 export { explainForGitsema } from './gitsema-adapter.js';
 export { renderTemplate } from './explainer-templates.js';
 export { estimateTokensFromChars, trimEvidenceForBudget } from './prompt-utils.js';
+export { createChatProvider } from './chat-provider.js';
+export { runAgentLoop } from './agent-loop.js';
+export { createOpenAiChatHandler } from './openai-handler.js';

@@ -88,6 +88,18 @@ export class ChatSession {
   }
 
   /**
+   * Append a ChatMessage to the session history.
+   * @param {{role: string, content: string, toolName?: string, toolCalls?: any[]}} msg
+   */
+  append(msg) {
+    if (!msg || typeof msg !== 'object' || !msg.role) throw new Error('append requires a message with a role');
+    const entry = { role: msg.role, content: String(msg.content ?? '' ) };
+    if (msg.toolName) entry.toolName = msg.toolName;
+    if (msg.toolCalls) entry.toolCalls = Array.isArray(msg.toolCalls) ? msg.toolCalls : [];
+    this._history.push(entry);
+  }
+
+  /**
    * Build a text prompt from the current conversation history and tool definitions.
    * @returns {string}
    */
