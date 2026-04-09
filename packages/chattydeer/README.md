@@ -1,2 +1,47 @@
 # chattydeer
-A Node.js minimal LLM chat completionist
+
+A Node.js minimal LLM chat completionist built on top of [@jsilvanus/embedeer](https://github.com/jsilvanus/embedeer).
+
+Provides `Explainer`, `LLMAdapter`, and prompt utilities for structured LLM-based explanation and narration tasks.
+
+## Install
+
+```sh
+npm install @jsilvanus/chattydeer
+```
+
+## Usage
+
+```js
+import { Explainer } from '@jsilvanus/chattydeer';
+
+const explainer = await Explainer.create('llama-3.2-3b', { deterministic: true });
+
+const result = await explainer.explain({
+  task: 'narrate',
+  domain: 'evolution',
+  context: { filePath: 'src/auth/handler.ts' },
+  evidence: [
+    { id: 1, source: 'src/auth/handler.ts', excerpt: '2024-03-15 *** LARGE CHANGE' },
+  ],
+  maxTokens: 256,
+});
+
+console.log(result.explanation); // "The auth handler underwent a major rewrite..."
+await explainer.destroy();
+```
+
+## API
+
+- `Explainer.create(modelName, opts)` — create an explainer bound to a model
+- `explainer.explain(request)` — explain using structured evidence blocks
+- `LLMAdapter.create(modelName, opts)` — low-level text-generation adapter
+- `explainForGitsema(payload, opts)` — gitsema-compatible adapter
+- `renderTemplate(domain, vars)` — render a domain-specific prompt template
+- `estimateTokensFromChars(chars)` / `trimEvidenceForBudget(prelude, evidence, budget)` — prompt utilities
+
+See [explainer-contract.md](./explainer-contract.md) for the full interface contract.
+
+## License
+
+MIT

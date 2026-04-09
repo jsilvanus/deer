@@ -1,0 +1,48 @@
+{
+  "name": "@jsilvanus/chattydeer",
+  "version": "1.0.0",
+  "description": "A Node.js minimal LLM chat completionist — wraps embedeer with Explainer and LLM adapter capabilities",
+  "main": "src/index.js",
+  "files": [
+    "src",
+    "README.md",
+    "explainer-contract.md"
+  ],
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "coverage": "c8 node --test test/*.test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jsilvanus/chattydeer.git"
+  },
+  "keywords": [
+    "llm",
+    "chat",
+    "huggingface",
+    "transformers",
+    "explainer",
+    "nlp",
+    "onnxruntime"
+  ],
+  "author": "jsilvanus",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
+  "bugs": {
+    "url": "https://github.com/jsilvanus/chattydeer/issues"
+  },
+  "homepage": "https://github.com/jsilvanus/chattydeer#readme",
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@huggingface/transformers": "^4.0.1",
+    "@jsilvanus/embedeer": "file:../embedeer"
+  },
+  "devDependencies": {
+    "c8": "^8.0.1"
+  }
+}
