@@ -130,8 +130,13 @@ export class ChatSession {
       const { toolCalls, finalAnswer } = this._parseResponse(rawText);
 
       if (finalAnswer !== null) {
-        this._history.push({ role: 'assistant', content: finalAnswer });
-        return finalAnswer;
+        // Small causal LMs often hallucinate the next turn of conversation.
+        // Truncate at the first role marker that appears after the start.
+        const roleMarker = /\n(?:System|User|Assistant|Tool)\s*:/;
+        const cut = finalAnswer.search(roleMarker);
+        const cleanAnswer = (cut !== -1 ? finalAnswer.slice(0, cut) : finalAnswer).trim();
+        this._history.push({ role: 'assistant', content: cleanAnswer });
+        return cleanAnswer;
       }
 
       this._history.push({ role: 'assistant', content: rawText, toolCalls: toolCalls ?? [] });

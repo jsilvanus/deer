@@ -76,7 +76,10 @@ export class LLMAdapter {
       let text = '';
       if (Array.isArray(out) && out.length > 0) {
         const item: any = (out as any)[0];
-        text = item.generated_text ?? item.text ?? JSON.stringify(out);
+        const generated: string = item.generated_text ?? item.text ?? JSON.stringify(out);
+        // The text-generation pipeline returns the full prompt + continuation;
+        // strip the prompt prefix so callers only see the newly generated text.
+        text = generated.startsWith(prompt) ? generated.slice(prompt.length) : generated;
       } else {
         text = String(out);
       }
@@ -95,13 +98,14 @@ export class LLMAdapter {
     this.deterministic = deterministic;
   }
 
-  async generate(prompt: string, { maxTokens = 256, temperature = 0, top_k = 1, top_p = 1, do_sample = false, ...rest } : any = {}) {
+  async generate(prompt: string, { maxTokens = 256, temperature = 0, top_k = 1, top_p = 1, do_sample = false, repetition_penalty = 1.3, ...rest } : any = {}) {
     const genOpts = {
       max_new_tokens: maxTokens,
       temperature,
       top_k,
       top_p,
       do_sample,
+      repetition_penalty,
       ...rest,
     };
     const res = await this.generateFn(prompt, genOpts);
