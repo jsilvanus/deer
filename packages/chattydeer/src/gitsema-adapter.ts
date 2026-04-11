@@ -1,6 +1,18 @@
 import { Explainer } from './explainer.js';
 
-export async function explainForGitsema(payload: any = {}, opts: any = {}) {
+/**
+ * explainFromPayload — generic helper that creates an Explainer from a model
+ * name, maps a plain payload object to an explain request, runs it, and
+ * optionally destroys the explainer afterwards.
+ *
+ * The payload shape is intentionally generic: any object that carries
+ * { task, domain, context, evidence, maxTokens, model } fields.  This keeps
+ * the adapter decoupled from any specific upstream project's data format.
+ *
+ * Callers (e.g. gitsema) are responsible for mapping their own payload to
+ * this shape before calling this function.
+ */
+export async function explainFromPayload(payload: any = {}, opts: any = {}) {
   const { autoDestroy = false } = opts;
   const modelName = payload.model || opts.model || 'default-model';
   const explainer = await Explainer.create(modelName, opts);
@@ -24,4 +36,13 @@ export async function explainForGitsema(payload: any = {}, opts: any = {}) {
   return res;
 }
 
-export default { explainForGitsema };
+/**
+ * explainForGitsema — backward-compatible alias for explainFromPayload.
+ *
+ * @deprecated The gitsema-specific adapter logic belongs in the gitsema
+ * project.  Prefer explainFromPayload for new integrations, or call
+ * Explainer directly.
+ */
+export const explainForGitsema = explainFromPayload;
+
+export default { explainFromPayload, explainForGitsema };

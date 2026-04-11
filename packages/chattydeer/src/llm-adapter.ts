@@ -1,10 +1,12 @@
 /**
  * LLMAdapter — small abstraction over a text-generation backend.
+ *
+ * Backend dependencies (@huggingface/transformers, @jsilvanus/embedeer) are
+ * loaded lazily via dynamic import inside create() so that callers who inject
+ * their own generateFn never pay the cost of loading those packages, and so
+ * that the adapter core remains decoupled from any specific backend.
  */
 
-import { pipeline, env } from '@huggingface/transformers';
-import { getCacheDir, buildPipelineOptions, WorkerPool } from '@jsilvanus/embedeer';
-import { resolveProvider } from '@jsilvanus/embedeer/src/provider-loader.js';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 
@@ -21,11 +23,18 @@ export class LLMAdapter {
       return new LLMAdapter(generateFn, modelName, !!deterministic);
     }
 
+    // Lazy-load backend packages so callers who inject generateFn directly
+    // never pull in @jsilvanus/embedeer or @huggingface/transformers.
+    const { getCacheDir, buildPipelineOptions, WorkerPool } =
+      await import('@jsilvanus/embedeer');
+    const { pipeline, env } = await import('@huggingface/transformers');
+
     if (token) process.env.HF_TOKEN = token;
     const resolvedCache = getCacheDir(cacheDir);
     env.cacheDir = resolvedCache;
 
     if (useWorkerPool) {
+      const { resolveProvider } = await import('@jsilvanus/embedeer/src/provider-loader.js');
       const __dirname = dirname(fileURLToPath(import.meta.url));
       const workerScript = join(__dirname, 'worker-gen.js');
       const threadWorkerScript = join(__dirname, 'thread-worker-gen-script.js');
@@ -53,6 +62,7 @@ export class LLMAdapter {
       return adapter;
     }
 
+    const { resolveProvider } = await import('@jsilvanus/embedeer/src/provider-loader.js');
     const deviceStr = await resolveProvider(device, provider);
     const pipelineOpts = {
       ...buildPipelineOptions(dtype),

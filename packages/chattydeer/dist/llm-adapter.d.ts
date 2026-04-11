@@ -1,5 +1,10 @@
 /**
  * LLMAdapter — small abstraction over a text-generation backend.
+ *
+ * Backend dependencies (@huggingface/transformers, @jsilvanus/embedeer) are
+ * loaded lazily via dynamic import inside create() so that callers who inject
+ * their own generateFn never pay the cost of loading those packages, and so
+ * that the adapter core remains decoupled from any specific backend.
  */
 export declare class LLMAdapter {
     generateFn: any;
