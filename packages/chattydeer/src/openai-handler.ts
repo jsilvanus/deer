@@ -2,7 +2,10 @@ import { randomUUID } from 'crypto';
 import runAgentLoop from './agent-loop.js';
 
 export function createOpenAiChatHandler(provider: any, tools: any[] = [], executeTool: any, opts: any = {}) {
-  const { redactContent, maxRoundtrips = 5 } = opts;
+  // transformContent: generic hook to preprocess incoming message content
+  // (e.g. redaction, sanitisation). redactContent accepted as a backward-compatible alias.
+  const { transformContent, redactContent, maxRoundtrips = 5 } = opts;
+  const contentTransformer = transformContent ?? redactContent;
 
   if (!provider || typeof provider.complete !== 'function') {
     throw new Error('provider with complete() is required');
@@ -30,8 +33,8 @@ export function createOpenAiChatHandler(provider: any, tools: any[] = [], execut
       for (const m of incomingMessages) {
         const role = m.role || 'user';
         const content = String(m.content ?? '');
-        const redacted = typeof redactContent === 'function' ? redactContent(content) : content;
-        session.append({ role, content: redacted });
+        const transformed = typeof contentTransformer === 'function' ? contentTransformer(content) : content;
+        session.append({ role, content: transformed });
       }
 
       const reqTools = Array.isArray(body.functions) ? body.functions.map((f: any) => ({ name: f.name, description: f.description, parameters: f.parameters ?? {} })) : tools;
@@ -43,7 +46,7 @@ export function createOpenAiChatHandler(provider: any, tools: any[] = [], execut
         maxRoundtrips,
         maxTokens: body.max_tokens ?? body.maxTokens,
         temperature: body.temperature,
-        redactContent,
+        transformContent: contentTransformer,
       });
 
       const answer = String(agentResult.answer ?? '');

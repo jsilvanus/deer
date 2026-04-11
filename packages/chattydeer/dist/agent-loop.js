@@ -2,7 +2,12 @@
  * runAgentLoop — execute an agentic tool-calling loop using a ChatCompletionProvider.
  */
 export async function runAgentLoop(session, opts = {}) {
-    const { provider, tools = [], executeTool, maxRoundtrips = 5, maxTokens, temperature, onMessage, redactContent, } = opts;
+    const { provider, tools = [], executeTool, maxRoundtrips = 5, maxTokens, temperature, onMessage, 
+    // transformContent: generic hook to preprocess each message's content
+    // before sending to the provider (e.g. redaction, sanitisation, masking).
+    // redactContent is accepted as a backward-compatible alias.
+    transformContent, redactContent, } = opts;
+    const contentTransformer = transformContent ?? redactContent;
     if (!provider || typeof provider.complete !== 'function')
         throw new Error('provider with complete() required');
     if (!executeTool || typeof executeTool !== 'function')
@@ -12,7 +17,7 @@ export async function runAgentLoop(session, opts = {}) {
         const srcMessages = Array.isArray(session.history) ? session.history : (typeof session.history === 'function' ? session.history() : session.history);
         const redacted = (Array.isArray(srcMessages) ? srcMessages : []).map((m) => {
             const content = String(m.content ?? '');
-            return { role: m.role, content: typeof redactContent === 'function' ? redactContent(content) : content, toolName: m.toolName };
+            return { role: m.role, content: typeof contentTransformer === 'function' ? contentTransformer(content) : content, toolName: m.toolName };
         });
         const resp = await provider.complete({ session: { messages: redacted }, tools, maxTokens, temperature });
         const message = resp.message ?? { role: 'assistant', content: '' };
