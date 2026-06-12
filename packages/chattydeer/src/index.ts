@@ -12,4 +12,5 @@ export { renderTemplate } from './explainer-templates.js';
 export { estimateTokensFromChars, trimEvidenceForBudget } from './prompt-utils.js';
 export { createChatProvider } from './chat-provider.js';
 export { runAgentLoop } from './agent-loop.js';
+export { createAgentSession } from './agent-session.js';
 export { createOpenAiChatHandler } from './openai-handler.js';

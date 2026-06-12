@@ -219,7 +219,7 @@ test('complete() returns empty message when choices array is empty', async () =>
 // Request body construction
 // ---------------------------------------------------------------------------
 
-test('complete() includes functions in the request body when tools are provided', async () => {
+test('complete() includes tools in the request body in modern tool-calling shape when tools are provided', async () => {
   const savedFetch = globalThis.fetch;
   let sentBody;
   try {
@@ -230,15 +230,17 @@ test('complete() includes functions in the request body when tools are provided'
     const provider = createChatProvider('http://localhost:1234', 'model');
     const tools = [{ name: 'lookup', description: 'Look it up', parameters: { type: 'object', properties: {} } }];
     await provider.complete({ session: { messages: [] }, tools });
-    assert.ok(Array.isArray(sentBody.functions));
-    assert.equal(sentBody.functions[0].name, 'lookup');
-    assert.equal(sentBody.functions[0].description, 'Look it up');
+    assert.ok(Array.isArray(sentBody.tools));
+    assert.equal(sentBody.tools[0].type, 'function');
+    assert.equal(sentBody.tools[0].function.name, 'lookup');
+    assert.equal(sentBody.tools[0].function.description, 'Look it up');
+    assert.ok(!('functions' in sentBody));
   } finally {
     globalThis.fetch = savedFetch;
   }
 });
 
-test('complete() does not include functions key when no tools provided', async () => {
+test('complete() does not include tools key when no tools provided', async () => {
   const savedFetch = globalThis.fetch;
   let sentBody;
   try {
@@ -248,7 +250,7 @@ test('complete() does not include functions key when no tools provided', async (
     };
     const provider = createChatProvider('http://localhost:1234', 'model');
     await provider.complete({ session: { messages: [] } });
-    assert.ok(!('functions' in sentBody));
+    assert.ok(!('tools' in sentBody));
   } finally {
     globalThis.fetch = savedFetch;
   }

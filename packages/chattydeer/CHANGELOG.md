@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.4.4
+
+- `createChatProvider`: tool definitions are now sent as `body.tools:
+  [{ type: 'function', function: { name, description, parameters } }]`
+  (the modern OpenAI/Ollama `/v1`/vLLM tool-calling shape) instead of the
+  deprecated `body.functions`. Response parsing still accepts both
+  `tool_calls` and the legacy `function_call` for backward compatibility.
+- Added `createAgentSession(opts?)`, a minimal `{ history, append(msg) }`
+  session factory accepted by `runAgentLoop` and `createChatProvider`,
+  so callers no longer need to construct an LLM-backed `ChatSession` (or
+  hand-roll a session object) just to drive the agent loop.
+
 ## 0.4.3
 
 - `runAgentLoop`: tool calls/results now wire-map to the OpenAI chat-completions
