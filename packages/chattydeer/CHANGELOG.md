@@ -1,11 +1,18 @@
 # @jsilvanus/chattydeer
 
+## 0.4.5
+
+### Patch Changes
+
+- da11736: add NPM_CONFIG_PROVENANCE:true to release workflow
+- a669bd5: Set up automated versioning and npm publishing via Changesets and a CI-gated release workflow.
+
 ## 0.4.4
 
 ### Patch Changes
 
 - `createChatProvider`: tool definitions are now sent as `body.tools:
-  [{ type: 'function', function: { name, description, parameters } }]`
+[{ type: 'function', function: { name, description, parameters } }]`
   (the modern OpenAI/Ollama `/v1`/vLLM tool-calling shape) instead of the
   deprecated `body.functions`. Response parsing still accepts both
   `tool_calls` and the legacy `function_call` for backward compatibility.
