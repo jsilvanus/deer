@@ -113,7 +113,10 @@ export function createChatProvider(
     const srcMessages = _extractMessagesFromSession(sessionLike);
     const messages = _mapToOpenAiMessages(srcMessages);
 
-    const functions = tools.map((t: any) => ({ name: t.name, description: t.description, parameters: t.parameters ?? {} }));
+    const toolDefs = tools.map((t: any) => ({
+      type: 'function',
+      function: { name: t.name, description: t.description, parameters: t.parameters ?? {} },
+    }));
 
     const body: any = {
       model,
@@ -121,7 +124,7 @@ export function createChatProvider(
       temperature: typeof req.temperature === 'number' ? req.temperature : undefined,
       max_tokens: typeof req.maxTokens === 'number' ? req.maxTokens : undefined,
     };
-    if (functions.length > 0) body.functions = functions;
+    if (toolDefs.length > 0) body.tools = toolDefs;
     return body;
   }
 
