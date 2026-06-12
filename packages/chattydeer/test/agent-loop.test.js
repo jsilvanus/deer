@@ -115,10 +115,10 @@ test('runAgentLoop executes tool and continues to final answer', async () => {
   const session = makeSession([{ role: 'user', content: 'Search foo' }]);
 
   let toolCalled = false;
-  const executeTool = async (name, args) => {
+  const executeTool = async (call) => {
     toolCalled = true;
-    assert.equal(name, 'search');
-    assert.deepEqual(args, { q: 'foo' });
+    assert.equal(call.name, 'search');
+    assert.deepEqual(call.arguments, { q: 'foo' });
     return 'result: bar';
   };
 
@@ -164,7 +164,7 @@ test('runAgentLoop forwards tool execution errors as tool result messages (no th
 // maxRoundtrips guard
 // ---------------------------------------------------------------------------
 
-test('runAgentLoop throws when maxRoundtrips is exceeded', async () => {
+test('runAgentLoop returns best-available result when maxRoundtrips is exhausted (no throw)', async () => {
   const toolCalls = [{ id: 'l1', name: 'loop', arguments: {} }];
   const infiniteProvider = {
     complete: async () => ({
@@ -175,14 +175,15 @@ test('runAgentLoop throws when maxRoundtrips is exceeded', async () => {
   };
   const session = makeSession([{ role: 'user', content: 'loop forever' }]);
 
-  await assert.rejects(
-    () => runAgentLoop(session, {
-      provider: infiniteProvider,
-      executeTool: async () => 'ok',
-      maxRoundtrips: 2,
-    }),
-    /exceeded maxRoundtrips/,
-  );
+  const result = await runAgentLoop(session, {
+    provider: infiniteProvider,
+    executeTool: async () => 'ok',
+    maxRoundtrips: 2,
+  });
+
+  assert.equal(result.roundtrips, 2);
+  assert.equal(typeof result.answer, 'string');
+  assert.ok(Array.isArray(result.messages));
 });
 
 // ---------------------------------------------------------------------------
