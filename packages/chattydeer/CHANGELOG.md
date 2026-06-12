@@ -1,6 +1,8 @@
-# Changelog
+# @jsilvanus/chattydeer
 
 ## 0.4.4
+
+### Patch Changes
 
 - `createChatProvider`: tool definitions are now sent as `body.tools:
   [{ type: 'function', function: { name, description, parameters } }]`
@@ -13,6 +15,8 @@
   hand-roll a session object) just to drive the agent loop.
 
 ## 0.4.3
+
+### Patch Changes
 
 - `runAgentLoop`: tool calls/results now wire-map to the OpenAI chat-completions
   `tool_calls` / `tool_call_id` format instead of being collapsed to plain
