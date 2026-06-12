@@ -82,7 +82,7 @@ test('complete() extracts messages from session.history() function', async () =>
 // Message role mapping
 // ---------------------------------------------------------------------------
 
-test('complete() maps "tool" role to "system" in the outgoing request body', async () => {
+test('complete() maps "tool" role messages to role:"tool" with tool_call_id', async () => {
   const savedFetch = globalThis.fetch;
   let sentBody;
   try {
@@ -91,8 +91,35 @@ test('complete() maps "tool" role to "system" in the outgoing request body', asy
       return { ok: true, json: async () => openAiBody('ok') };
     };
     const provider = createChatProvider('http://localhost:1234', 'model');
-    await provider.complete({ session: { messages: [{ role: 'tool', content: 'tool result' }] } });
-    assert.equal(sentBody.messages[0].role, 'system');
+    await provider.complete({ session: { messages: [{ role: 'tool', content: 'tool result', toolCallId: 'call_1' }] } });
+    assert.equal(sentBody.messages[0].role, 'tool');
+    assert.equal(sentBody.messages[0].tool_call_id, 'call_1');
+    assert.equal(sentBody.messages[0].content, 'tool result');
+  } finally {
+    globalThis.fetch = savedFetch;
+  }
+});
+
+test('complete() maps assistant toolCalls to tool_calls with stringified arguments', async () => {
+  const savedFetch = globalThis.fetch;
+  let sentBody;
+  try {
+    globalThis.fetch = async (_url, opts) => {
+      sentBody = JSON.parse(opts.body);
+      return { ok: true, json: async () => openAiBody('ok') };
+    };
+    const provider = createChatProvider('http://localhost:1234', 'model');
+    await provider.complete({
+      session: {
+        messages: [
+          { role: 'assistant', content: '', toolCalls: [{ id: 'call_1', name: 'search', arguments: { q: 'foo' } }] },
+        ],
+      },
+    });
+    assert.equal(sentBody.messages[0].tool_calls[0].id, 'call_1');
+    assert.equal(sentBody.messages[0].tool_calls[0].type, 'function');
+    assert.equal(sentBody.messages[0].tool_calls[0].function.name, 'search');
+    assert.equal(sentBody.messages[0].tool_calls[0].function.arguments, JSON.stringify({ q: 'foo' }));
   } finally {
     globalThis.fetch = savedFetch;
   }
@@ -292,6 +319,109 @@ test('stream() yields a single delta chunk from complete()', async () => {
     assert.equal(chunks.length, 1);
     assert.equal(chunks[0].delta, 'Stream content.');
     assert.equal(chunks[0].done, true);
+  } finally {
+    globalThis.fetch = savedFetch;
+  }
+});
+
+test('stream() yields SSE deltas in order with done=true last', async () => {
+  const savedFetch = globalThis.fetch;
+  try {
+    const sseLines = [
+      `data: ${JSON.stringify({ choices: [{ delta: { content: 'Hel' } }] })}`,
+      `data: ${JSON.stringify({ choices: [{ delta: { content: 'lo' } }] })}`,
+      'data: [DONE]',
+      '',
+    ].join('\n');
+
+    globalThis.fetch = async () => ({
+      ok: true,
+      status: 200,
+      headers: { get: (k) => (k === 'content-type' ? 'text/event-stream' : null) },
+      body: {
+        getReader: () => {
+          let sent = false;
+          return {
+            read: async () => {
+              if (sent) return { done: true, value: undefined };
+              sent = true;
+              return { done: false, value: new TextEncoder().encode(sseLines) };
+            },
+            releaseLock: () => {},
+          };
+        },
+      },
+    });
+
+    const provider = createChatProvider('http://localhost:1234', 'model');
+    const chunks = [];
+    for await (const chunk of provider.stream({ session: { messages: [] } })) {
+      chunks.push(chunk);
+    }
+    assert.equal(chunks[0].delta, 'Hel');
+    assert.equal(chunks[1].delta, 'lo');
+    assert.equal(chunks[chunks.length - 1].done, true);
+  } finally {
+    globalThis.fetch = savedFetch;
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Timeout, retry, abort
+// ---------------------------------------------------------------------------
+
+test('complete() aborts and returns an error result on timeout', async () => {
+  const savedFetch = globalThis.fetch;
+  try {
+    globalThis.fetch = (_url, opts) => new Promise((_resolve, reject) => {
+      opts.signal.addEventListener('abort', () => {
+        const err = new Error('aborted');
+        err.name = 'AbortError';
+        reject(err);
+      });
+    });
+    const provider = createChatProvider('http://localhost:1234', 'model', undefined, { timeoutMs: 10, maxRetries: 0 });
+    const result = await provider.complete({ session: { messages: [] } });
+    assert.equal(result.finishReason, 'error');
+    assert.ok(result.message.content.includes('timed out'));
+  } finally {
+    globalThis.fetch = savedFetch;
+  }
+});
+
+test('complete() retries on HTTP 500 and succeeds', async () => {
+  const savedFetch = globalThis.fetch;
+  try {
+    let calls = 0;
+    globalThis.fetch = async () => {
+      calls++;
+      if (calls === 1) {
+        return { ok: false, status: 500, text: async () => 'server error' };
+      }
+      return { ok: true, status: 200, json: async () => openAiBody('recovered') };
+    };
+    const provider = createChatProvider('http://localhost:1234', 'model', undefined, { maxRetries: 2 });
+    const result = await provider.complete({ session: { messages: [] } });
+    assert.equal(calls, 2);
+    assert.equal(result.message.content, 'recovered');
+  } finally {
+    globalThis.fetch = savedFetch;
+  }
+});
+
+test('complete() gives up after exhausting retry budget on persistent 500s', async () => {
+  const savedFetch = globalThis.fetch;
+  try {
+    let calls = 0;
+    globalThis.fetch = async () => {
+      calls++;
+      return { ok: false, status: 500, text: async () => 'still broken' };
+    };
+    const provider = createChatProvider('http://localhost:1234', 'model', undefined, { maxRetries: 1 });
+    const result = await provider.complete({ session: { messages: [] } });
+    assert.equal(calls, 2);
+    assert.equal(result.finishReason, 'error');
+    assert.ok(result.message.content.includes('500'));
   } finally {
     globalThis.fetch = savedFetch;
   }

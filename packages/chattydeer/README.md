@@ -158,9 +158,50 @@ Additional `ChatSession` notes:
 
 ### Agentic helpers
 
-- `createChatProvider(httpUrl, model, apiKey)` — factory that returns a `ChatCompletionProvider` with `complete()` and `stream()` methods; useful if you need to proxy to an OpenAI-compatible endpoint.
-- `runAgentLoop(session, opts)` — run an agentic tool-calling loop using a `ChatCompletionProvider`. Options include `provider`, `tools`, `executeTool`, `maxRoundtrips`, `maxTokens`, `temperature`, `onMessage`, and `redactContent` (a hook that can redact sensitive content before it leaves the process).
+- `createChatProvider(httpUrl, model, apiKey?, opts?)` — factory that returns a `ChatCompletionProvider` with `complete()` and `stream()` methods for any OpenAI-compatible endpoint (OpenAI, Ollama `/v1`, vLLM, llama.cpp server). `opts` accepts `timeoutMs` (default 60000) and `maxRetries` (default 2, applied to HTTP 429/5xx with exponential backoff). Pass `signal` on the request to support cancellation.
+- `runAgentLoop(session, opts)` — run an agentic tool-calling loop using a `ChatCompletionProvider`. Options include `provider`, `tools`, `executeTool(call: ToolCall): Promise<string>`, `maxRoundtrips` (default 5), `maxTokens`, `temperature`, `onMessage`, and `redactContent` (a hook applied to every message's content — including tool results — before it leaves the process). Per-tool-call errors become `role: 'tool'` result messages instead of crashing the loop. If `maxRoundtrips` is exhausted before a final text answer, the loop returns the best-available answer and history rather than throwing.
 - `createOpenAiChatHandler(provider, tools?, executeTool?, opts?)` — returns an Express `RequestHandler` implementing a lightweight subset of OpenAI's `POST /v1/chat/completions` API that maps requests to `runAgentLoop`. The handler honors the `redactContent` hook and is suitable for mounting inside an existing HTTP server.
+
+### OpenAI tool-calling wire format
+
+`ChatMessage`/`ToolCall` objects are mapped to OpenAI's chat-completions shape on the wire:
+
+- An assistant message with `toolCalls` is sent as `{ role: 'assistant', content, tool_calls: [{ id, type: 'function', function: { name, arguments: JSON.stringify(args) } }] }`.
+- A `role: 'tool'` result message (with `toolCallId` set to the corresponding `ToolCall.id`) is sent as `{ role: 'tool', tool_call_id, content }`.
+- Responses are parsed back from `message.tool_calls` (or the legacy `function_call`) into `ChatMessage.toolCalls`, each with a generated `id` if the server didn't provide one.
+
+This means any OpenAI-compatible endpoint (OpenAI, Ollama, vLLM, llama.cpp server) can be used as the `provider` for `runAgentLoop`.
+
+### Agent loop example
+
+```typescript
+import { ChatSession, createChatProvider, runAgentLoop } from '@jsilvanus/chattydeer';
+
+const provider = createChatProvider('http://localhost:11434', 'llama3.1', undefined, { timeoutMs: 30_000 });
+
+const session = new ChatSession({ generate: async () => ({ text: '' }) }, {
+  systemPrompt: 'You are a helpful assistant with access to tools.',
+});
+session.append({ role: 'user', content: 'What does the auth module do?' });
+
+const tools = [
+  { name: 'semantic_search', description: 'Search the codebase semantically', parameters: { type: 'object', properties: { query: { type: 'string' } }, required: ['query'] } },
+];
+
+const result = await runAgentLoop(session, {
+  provider,
+  tools,
+  maxRoundtrips: 5,
+  redactContent: (text) => text.replace(/sk-[a-zA-Z0-9]+/g, '[REDACTED]'),
+  async executeTool(call) {
+    if (call.name === 'semantic_search') return JSON.stringify(await mySearch(call.arguments.query));
+    return `Unknown tool: ${call.name}`;
+  },
+});
+
+console.log(result.answer);
+await provider.destroy();
+```
 
 See [explainer-contract.md](./explainer-contract.md) for the full Explainer interface contract.
 

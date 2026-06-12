@@ -46,6 +46,7 @@ export class ChatSession {
     if (!msg || typeof msg !== 'object' || !msg.role) throw new Error('append requires a message with a role');
     const entry: any = { role: msg.role, content: String(msg.content ?? '' ) };
     if (msg.toolName) entry.toolName = msg.toolName;
+    if (msg.toolCallId) entry.toolCallId = msg.toolCallId;
     if (msg.toolCalls) entry.toolCalls = Array.isArray(msg.toolCalls) ? msg.toolCalls : [];
     this._history.push(entry);
   }
@@ -152,7 +153,7 @@ export class ChatSession {
         } catch (err: any) {
           result = `Error executing tool \"${call.name}\": ${err.message}`;
         }
-        this._history.push({ role: 'tool', content: String(result), toolName: call.name });
+        this._history.push({ role: 'tool', content: String(result), toolName: call.name, toolCallId: call.id });
       }
     }
 

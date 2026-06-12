@@ -24,12 +24,20 @@ export async function runAgentLoop(session: any, opts: any = {}) {
   if (!executeTool || typeof executeTool !== 'function') throw new Error('executeTool callback required');
 
   let roundtrips = 0;
+  let lastAnswer = '';
 
   while (roundtrips < maxRoundtrips) {
     const srcMessages = Array.isArray(session.history) ? session.history : (typeof session.history === 'function' ? session.history() : session.history);
     const redacted = (Array.isArray(srcMessages) ? srcMessages : []).map((m: any) => {
       const content = String(m.content ?? '');
-      return { role: m.role, content: typeof contentTransformer === 'function' ? contentTransformer(content) : content, toolName: m.toolName };
+      const out: any = {
+        role: m.role,
+        content: typeof contentTransformer === 'function' ? contentTransformer(content) : content,
+        toolName: m.toolName,
+      };
+      if (m.toolCallId) out.toolCallId = m.toolCallId;
+      if (m.toolCalls) out.toolCalls = m.toolCalls;
+      return out;
     });
 
     const resp = await provider.complete({ session: { messages: redacted }, tools, maxTokens, temperature });
@@ -43,12 +51,13 @@ export async function runAgentLoop(session: any, opts: any = {}) {
       for (const call of toolCalls) {
         let result: any;
         try {
-          result = await executeTool(call.name, call.arguments ?? {}, call.id);
+          result = await executeTool(call);
         } catch (err: any) {
           result = `Error executing tool "${call.name}": ${err && err.message ? err.message : String(err)}`;
         }
-        session.append({ role: 'tool', content: String(result ?? ''), toolName: call.name });
-        if (typeof onMessage === 'function') onMessage({ role: 'tool', content: String(result ?? ''), toolName: call.name });
+        const toolMsg = { role: 'tool', content: String(result ?? ''), toolName: call.name, toolCallId: call.id };
+        session.append(toolMsg);
+        if (typeof onMessage === 'function') onMessage(toolMsg);
       }
 
       roundtrips++;
@@ -56,13 +65,14 @@ export async function runAgentLoop(session: any, opts: any = {}) {
     }
 
     const final = String(message.content ?? '');
+    lastAnswer = final;
     session.append({ role: 'assistant', content: final });
     if (typeof onMessage === 'function') onMessage({ role: 'assistant', content: final });
 
     return { answer: final, messages: session.history, roundtrips };
   }
 
-  throw new Error(`Agent loop exceeded maxRoundtrips (${maxRoundtrips})`);
+  return { answer: lastAnswer, messages: session.history, roundtrips };
 }
 
 export default runAgentLoop;

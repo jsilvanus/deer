@@ -78,7 +78,7 @@ pnpm run cli
 
 GitHub Actions (`.github/workflows/ci.yml`) triggers on pushes/PRs to `main`:
 
-1. Setup Node 20 + pnpm
+1. Setup Node 24 + pnpm
 2. `pnpm install`
 3. `pnpm run build && pnpm run build:types`
 4. `pnpm test`
