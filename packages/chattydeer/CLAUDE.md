@@ -259,4 +259,4 @@ Versioning, changelog, and publishing are automated via [Changesets](https://git
 3. Merging the "Version Packages" PR triggers the release workflow again; with no pending changesets and a version bump present, it runs `pnpm changeset publish` to publish to npm.
 4. Publishing uses npm's OIDC **Trusted Publishing** — no `NPM_TOKEN` secret is stored. The npm package must have this repo's `release.yml` workflow registered as a Trusted Publisher (npmjs.com → package → Settings → Trusted Publisher).
 
-Do not manually edit the `version` field in `package.json` — let Changesets manage it.
+**Do not run `npm version`, `pnpm version`, or manually edit the `version` field in `package.json`.** Do not run `npm publish` / `pnpm publish` locally either. All versioning and publishing is handled by Changesets and the release workflow as described above — the only manual step for a contributor is `pnpm changeset`.
