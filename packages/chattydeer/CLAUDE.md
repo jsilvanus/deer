@@ -246,8 +246,17 @@ The `explainForGitsema(payload, adapter)` function bridges the gitsema semantic 
 ## Package & Publishing
 
 - **Package manager:** pnpm (preferred); npm supported via `package-lock.json`
-- **Registry:** npm public (`publishConfig.access: "public"`)
+- **Registry:** npm public (`publishConfig.access: "public"`, with npm provenance enabled)
 - **Published files:** `assets/`, `dist/`, `README.md`, `explainer-contract.md`
 - `prepare` and `prepublishOnly` both run `build + build:types` automatically
 
-When bumping the version, update `package.json` version field and ensure `dist/` is rebuilt before publishing.
+### Releases (Changesets)
+
+Versioning, changelog, and publishing are automated via [Changesets](https://github.com/changesets/changesets) and `.github/workflows/release.yml`:
+
+1. When making a user-facing change, run `pnpm changeset` and describe the change (patch/minor/major). Commit the generated `.changeset/*.md` file with your PR.
+2. On merge to `main`, the release workflow builds, type-checks, and runs `pnpm test`. If they pass and there are pending changesets, it opens/updates a "Version Packages" PR that bumps `package.json`, updates `CHANGELOG.md`, and consumes the changeset files.
+3. Merging the "Version Packages" PR triggers the release workflow again; with no pending changesets and a version bump present, it runs `pnpm changeset publish` to publish to npm.
+4. Publishing uses npm's OIDC **Trusted Publishing** — no `NPM_TOKEN` secret is stored. The npm package must have this repo's `release.yml` workflow registered as a Trusted Publisher (npmjs.com → package → Settings → Trusted Publisher).
+
+Do not manually edit the `version` field in `package.json` — let Changesets manage it.
