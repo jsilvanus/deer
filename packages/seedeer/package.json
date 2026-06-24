@@ -1,0 +1,55 @@
+{
+  "name": "@jsilvanus/seedeer",
+  "version": "0.1.0",
+  "description": "A Node.js vision-model toolkit: detection/tracking with zone triggers, visual question answering, captioning, and image embeddings (joint and vision-only), importable directly with no HTTP required.",
+  "type": "module",
+  "main": "src/index.js",
+  "types": "src/index.d.ts",
+  "bin": {
+    "seedeer": "src/cli.js"
+  },
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "daemon": "node src/socket-model-server.js",
+    "server": "node src/grpc-model-server.js"
+  },
+  "keywords": [
+    "vision",
+    "computer-vision",
+    "object-detection",
+    "object-tracking",
+    "vqa",
+    "visual-question-answering",
+    "image-captioning",
+    "image-embeddings",
+    "clip",
+    "large-language-models",
+    "nodejs",
+    "huggingface-transformers"
+  ],
+  "license": "MIT",
+  "author": "jsilvanus",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@huggingface/transformers": "^3.0.0",
+    "onnxruntime-node": "^1.19.0"
+  },
+  "optionalDependencies": {
+    "@grpc/grpc-js": "^1.10.0",
+    "@grpc/proto-loader": "^0.7.0"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jsilvanus/seedeer.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jsilvanus/seedeer/issues"
+  },
+  "homepage": "https://github.com/jsilvanus/seedeer#readme"
+}
