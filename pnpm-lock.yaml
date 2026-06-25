@@ -60,11 +60,23 @@ importers:
         specifier: ^0.8.0
         version: 0.8.1
 
+  packages/nudeer:
+    optionalDependencies:
+      '@grpc/grpc-js':
+        specifier: ^1.10.0
+        version: 1.14.4
+      '@grpc/proto-loader':
+        specifier: ^0.7.0
+        version: 0.7.15
+
   packages/seedeer:
     dependencies:
       '@huggingface/transformers':
         specifier: ^3.0.0
         version: 3.8.1
+      '@jsilvanus/nudeer':
+        specifier: workspace:*
+        version: link:../nudeer
       onnxruntime-node:
         specifier: ^1.19.0
         version: 1.27.0
