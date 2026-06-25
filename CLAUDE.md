@@ -16,6 +16,47 @@ Each package has its own `CLAUDE.md` with package-specific architecture, command
 
 Read the relevant package's `CLAUDE.md` before working inside that package's directory.
 
+## Canonical Documents (Keep in Sync)
+
+Certain documents are the **source of truth** for information that appears in multiple places. Always update all copies when information changes:
+
+| Document | What it owns | Sync points |
+|---|---|---|
+| **Root [`CLAUDE.md`](CLAUDE.md)** | Monorepo structure, workspace commands, release process | Package list must match `packages/` dirs. Commands must match root `package.json` scripts. |
+| **Root [`README.md`](README.md)** | Public monorepo overview, package links | Package descriptions and links must match root `CLAUDE.md` and each package's `README.md`. |
+| **Root [`CONTRIBUTING.md`](CONTRIBUTING.md)** | Governance: commits, changesets, testing, breaking changes | Must reflect current `.changeset/config.json`, `package.json` test scripts, and CI workflow. |
+| **Package `package.json`** | Version, name, dependencies, scripts, repo metadata | Exports/entries must match type definitions. Scripts must match package `CLAUDE.md`. Repository URL must be `jsilvanus/deer` with `directory` field. |
+| **Package `CLAUDE.md`** | Architecture, commands, conventions | Scripts must match `package.json`. Exports must match `index.d.ts` or `index.js`. Dependency calls must match `package.json` dependencies. |
+| **Package `README.md`** | Public-facing API and features | Description must match `package.json`. Examples must match exported API in `CLAUDE.md`. Links to other packages must use root monorepo links. |
+| **Package `index.d.ts` or `index.js`** | Public API surface | All exports must be documented in `CLAUDE.md` and `README.md`. Breaking changes here require major bump + migration guide. |
+| **`.changeset/config.json`** | Changeset rules and version strategy | Bump rules, commit patterns, and package list must match `CONTRIBUTING.md` guidelines. |
+| **`.github/workflows/release.yml`** | CI/CD for releases | Must run `pnpm test` for all packages. Publish commands must match `.changeset/config.json`. |
+
+### Examples of sync failures to avoid
+
+❌ **Package added to `packages/` but not listed in root `CLAUDE.md`** — Contributors don't know it exists.
+
+❌ **`CLAUDE.md` says "run `pnpm daemon`" but `package.json` has no `daemon` script** — Commands fail.
+
+❌ **`README.md` links to old GitHub org (e.g., `jsilvanus/embedeer`) instead of monorepo** — Users fork the wrong repo.
+
+❌ **`package.json` lists 4 packages but `CONTRIBUTING.md` lists only 3 scopes in `.commitlintrc.json`** — Commits fail lint.
+
+❌ **`seedeer/CLAUDE.md` documents a `fancyMode` option but it's not in `package.json` dependencies or exports** — Undocumented/unavailable feature.
+
+❌ **Version bumps in `package.json` done manually instead of via Changesets** — Release automation breaks; `CHANGELOG.md` not updated.
+
+### Sync checklist for changes
+
+When you modify something that appears in multiple places, check:
+
+- [ ] **Added a package?** Update root `CLAUDE.md` list + `README.md` + `.commitlintrc.json` scopes + `CONTRIBUTING.md`
+- [ ] **Added a script/command?** Update `package.json` + package `CLAUDE.md`
+- [ ] **Changed public API (exports)?** Update `index.d.ts` + package `README.md` + package `CLAUDE.md`
+- [ ] **Updated a README?** Ensure links point to root monorepo and match `CLAUDE.md` descriptions
+- [ ] **Changed governance rules?** Update `CONTRIBUTING.md`, `.commitlintrc.json`, and `.github/workflows/release.yml`
+- [ ] **Updated dependencies?** Update package `CLAUDE.md` dependency list and package `README.md` if user-facing
+
 ## Commands
 
 ```bash
