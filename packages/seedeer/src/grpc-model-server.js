@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { createModelServerCore } from '@jsilvanus/nudeer';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const PROTO_PATH = path.join(__dirname, '..', '..', '..', 'nudeer', 'src', 'model.proto');
+const PROTO_PATH = path.join(__dirname, 'shared', 'model.proto');
 
 /**
  * Starts a gRPC server hosting a single seedeer engine, exposing it as a
@@ -32,7 +32,7 @@ export async function startGrpcServer({ enginePath, engineOptions, concurrency, 
     defaults: true,
     oneofs: true,
   });
-  const proto = grpc.loadPackageDefinition(packageDef).nudeer;
+  const proto = grpc.loadPackageDefinition(packageDef).seedeer;
 
   const core = createModelServerCore({ enginePath, engineOptions, concurrency });
   await core.start();
