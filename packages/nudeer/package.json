@@ -1,6 +1,6 @@
 {
   "name": "@jsilvanus/nudeer",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Generic worker pool and model server infrastructure for embeddings, vision, and other model types. Supports process, thread, socket, and gRPC execution modes.",
   "type": "module",
   "main": "src/index.js",
