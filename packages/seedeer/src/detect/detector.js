@@ -1,4 +1,4 @@
-import { WorkerPool } from '../shared/worker-pool.js';
+import { WorkerPool } from '@jsilvanus/nudeer';
 
 const ENGINE_PATH = new URL('./detect-engine.js', import.meta.url).href;
 

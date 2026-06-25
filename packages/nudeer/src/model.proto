@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package nudeer;
+
+// A single generic RPC carrying JSON-encoded payloads. nudeer's users
+// differ in task shape (embeddings vs. captions vs. detections), so rather
+// than maintaining one proto message per use case, the task and result are
+// opaque JSON on the wire and typed at the JS layer (matching the in-process
+// 'process'/'thread' modes exactly).
+service ModelService {
+  rpc Run (TaskRequest) returns (TaskResult);
+}
+
+message TaskRequest {
+  bytes payload = 1;
+}
+
+message TaskResult {
+  bool ok = 1;
+  bytes payload = 2;
+}
