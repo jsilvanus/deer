@@ -15,7 +15,7 @@ import { VqaAssistant } from '@jsilvanus/seedeer';
 // Local backend (default) — small in-process VLM
 const vqa = await VqaAssistant.create({
   backend: 'local',
-  model: 'Xenova/some-small-vlm',
+  model: 'HuggingFaceTB/SmolVLM-256M-Instruct', // default if omitted
   mode: 'process',
 });
 

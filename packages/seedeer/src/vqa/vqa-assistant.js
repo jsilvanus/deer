@@ -1,4 +1,3 @@
-import { NotImplementedError } from '../errors.js';
 import { LocalVqaBackend } from './backends/local-backend.js';
 import { RemoteVqaBackend } from './backends/remote-backend.js';
 
@@ -7,21 +6,32 @@ import { RemoteVqaBackend } from './backends/remote-backend.js';
  * docs/features/vqa.md.
  */
 export class VqaAssistant {
+  #backend;
+
+  constructor(backend) {
+    this.#backend = backend;
+  }
+
   /**
    * @param {object} options
    * @param {'local'|'remote'} [options.backend]  Default: 'local'
    * @param {string} [options.model]              Model identifier (local) or model name (remote)
    * @param {string} [options.endpoint]           Required when backend === 'remote'
+   * @param {string} [options.apiKey]             API key, for backend === 'remote'
    * @param {string} [options.mode]               'process' | 'thread' | 'socket' | 'grpc' (local backend only)
    * @param {string} [options.device]             'cpu' | 'gpu' | 'auto' (local backend only)
    * @returns {Promise<VqaAssistant>}
    */
   static async create(options = {}) {
-    const backend = options.backend ?? 'local';
-    if (backend !== 'local' && backend !== 'remote') {
-      throw new Error(`Unknown VQA backend "${backend}". Expected "local" or "remote".`);
+    const backendKind = options.backend ?? 'local';
+    if (backendKind !== 'local' && backendKind !== 'remote') {
+      throw new Error(`Unknown VQA backend "${backendKind}". Expected "local" or "remote".`);
     }
-    throw new NotImplementedError('VqaAssistant', 'Phase 3 (see docs/ROADMAP.md)');
+    const backend =
+      backendKind === 'local'
+        ? await LocalVqaBackend.create(options)
+        : await RemoteVqaBackend.create(options);
+    return new VqaAssistant(backend);
   }
 
   /**
@@ -30,11 +40,11 @@ export class VqaAssistant {
    * @returns {Promise<string>}
    */
   async ask(image, question) {
-    throw new NotImplementedError('VqaAssistant.ask', 'Phase 3 (see docs/ROADMAP.md)');
+    return this.#backend.ask(image, question);
   }
 
   async destroy() {
-    throw new NotImplementedError('VqaAssistant.destroy', 'Phase 3 (see docs/ROADMAP.md)');
+    await this.#backend.destroy();
   }
 }
 

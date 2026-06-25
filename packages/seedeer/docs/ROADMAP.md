@@ -13,7 +13,7 @@ Order chosen by: lowest architectural risk first, real-time/streaming work
   writing integration code against the real shape before models are wired
   up.
 
-## Phase 1 — Image embeddings
+## Phase 1 — Image embeddings ✅ done
 
 Lowest risk: closest in shape to embedeer's existing, proven embedding
 pipeline (batch in, vectors out, no streaming, no generation).
@@ -26,15 +26,15 @@ pipeline (batch in, vectors out, no streaming, no generation).
 - `process`/`thread`/`socket`/`grpc` modes, mirroring embedeer exactly.
 - Model caching under `~/.seedeer/models`, same convention as embedeer.
 
-## Phase 2 — Captioning
+## Phase 2 — Captioning ✅ done
 
 - `Captioner.caption(image)` → short text description.
-- Single small model (BLIP-class), local-or-remote per the same mode
-  options.
+- Single small model (image-to-text class, e.g. ViT-GPT2), local-or-remote
+  per the same mode options.
 - Validates the "image in, generation out" path before VQA adds the
   complexity of a question prompt.
 
-## Phase 3 — Visual Question Answering
+## Phase 3 — Visual Question Answering ✅ done
 
 - `VqaAssistant.ask(image, question)` → text answer.
 - Backend abstraction: `backend: 'local'` (in-process small VLM) vs
@@ -43,11 +43,13 @@ pipeline (batch in, vectors out, no streaming, no generation).
 - Local and remote backends must satisfy the same interface so swapping
   config doesn't change calling code.
 
-## Phase 4 — Detect + Track + Zone-trigger
+## Phase 4 — Detect + Track + Zone-trigger ✅ done
 
 Highest risk, done last, after the request/response patterns are proven.
 
-- `Detector` — per-frame bounding boxes (YOLO-nano class ONNX model).
+- `Detector` — per-frame bounding boxes (YOLOS-tiny-class ONNX model via
+  the generic object-detection pipeline, filtered to a configurable
+  label, default `'person'`).
 - `Tracker` — assigns persistent IDs across frames on top of `Detector`
   output (IOU tracker first; ByteTrack-class upgrade later if needed).
 - `ZoneTrigger` — named regions (rect/polygon) + enter/exit event emission
@@ -58,11 +60,18 @@ Highest risk, done last, after the request/response patterns are proven.
 - `process`/`thread` local modes first (latency-critical default); `grpc`
   remote mode added for symmetry once the local path is solid.
 
-## Phase 5 — Hardening (ongoing, not blocking earlier phases)
+## Phase 5 — Hardening ✅ done
 
-- Benchmark scripts per pillar, mirroring embedeer's `bench/` directory.
-- Multi-server load balancing for embeddings/VQA/captioning (same pattern
-  as embedeer's `servers: []` option).
+- Benchmark scripts per pillar, mirroring embedeer's `bench/` directory —
+  see `bench/*.bench.js`, run via `npm run bench`.
+- Multi-server load balancing for every pillar's `socket`/`grpc` modes:
+  `WorkerPool` round-robins across `options.servers` (already wired
+  through every `*.create()` call); covered by a regression test in
+  `test/remote-modes.test.js`. While verifying this, found and fixed a
+  `WorkerPool.initialize()` race — concurrent callers before the first
+  connection settled could each open their own duplicate
+  worker/connection set, leaking sockets that made server shutdown hang.
+  `initialize()` now memoizes the in-flight setup promise.
 - Optional on-demand GPU VPS provisioning helper — explicitly a separate
   tool, not part of the seedeer package itself (see Non-goals in
   `docs/ARCHITECTURE.md`).

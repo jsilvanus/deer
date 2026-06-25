@@ -1,4 +1,12 @@
-import { NotImplementedError } from '../errors.js';
+import { WorkerPool } from '../shared/worker-pool.js';
+
+const ENGINE_PATH = new URL('./embed-engine.js', import.meta.url).href;
+
+function chunk(array, size) {
+  const out = [];
+  for (let i = 0; i < array.length; i += size) out.push(array.slice(i, i + size));
+  return out;
+}
 
 /**
  * Vision-only embedder (DINOv2-class models). Not comparable to text
@@ -6,24 +14,54 @@ import { NotImplementedError } from '../errors.js';
  * near-duplicate detection. See docs/features/embeddings.md.
  */
 export class VisualEmbedder {
+  #pool;
+  #batchSize;
+
+  constructor(pool, batchSize) {
+    this.#pool = pool;
+    this.#batchSize = batchSize;
+  }
+
   /**
    * @param {string} modelName             Hugging Face model identifier
    * @param {object} [options]             Same shape as JointEmbedder options
    * @returns {Promise<VisualEmbedder>}
    */
   static async create(modelName, options = {}) {
-    throw new NotImplementedError('VisualEmbedder', 'Phase 1 (see docs/ROADMAP.md)');
+    const {
+      mode = 'process',
+      device = 'auto',
+      provider,
+      batchSize = 32,
+      concurrency = 2,
+      cacheDir,
+      dtype,
+      servers,
+    } = options;
+
+    const pool = new WorkerPool(ENGINE_PATH, {
+      mode,
+      concurrency,
+      servers,
+      engineOptions: { kind: 'visual', modelName, device, provider, cacheDir, dtype },
+    });
+    await pool.initialize();
+    return new VisualEmbedder(pool, batchSize);
   }
 
   /**
-   * @param {Array<string|Buffer>} images  File paths or image buffers
+   * @param {Array<string|Buffer>} images  File paths/URLs or image buffers
    * @returns {Promise<number[][]>}
    */
   async embedImages(images) {
-    throw new NotImplementedError('VisualEmbedder.embedImages', 'Phase 1 (see docs/ROADMAP.md)');
+    const batches = chunk(images, this.#batchSize);
+    const results = await Promise.all(
+      batches.map((batchImages) => this.#pool.run({ type: 'embedImages', images: batchImages })),
+    );
+    return results.flat();
   }
 
   async destroy() {
-    throw new NotImplementedError('VisualEmbedder.destroy', 'Phase 1 (see docs/ROADMAP.md)');
+    await this.#pool.destroy();
   }
 }

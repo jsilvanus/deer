@@ -1,32 +1,70 @@
-import { NotImplementedError } from '../errors.js';
+import { WorkerPool } from '../shared/worker-pool.js';
+
+const ENGINE_PATH = new URL('./detect-engine.js', import.meta.url).href;
 
 /**
- * Per-frame person detection (YOLO-nano-class ONNX model). Fast, stateless
- * on its own — see TrackingSession for the stateful pipeline built on top.
- * See docs/features/detection-tracking.md.
+ * Per-frame person detection (YOLOS-tiny-class ONNX model run through an
+ * object-detection pipeline, filtered to a single label by default). Fast,
+ * stateless on its own — see TrackingSession for the stateful pipeline
+ * built on top. See docs/features/detection-tracking.md.
  */
 export class Detector {
+  #pool;
+  #label;
+  #threshold;
+
+  constructor(pool, label, threshold) {
+    this.#pool = pool;
+    this.#label = label;
+    this.#threshold = threshold;
+  }
+
   /**
    * @param {object} [options]
-   * @param {string} [options.model]    Model identifier
-   * @param {string} [options.mode]     'process' | 'thread' | 'grpc' (default: 'process')
-   * @param {string} [options.device]   'cpu' | 'gpu' | 'auto' (default: 'cpu')
-   * @param {string} [options.provider] 'cpu' | 'cuda' | 'dml'
+   * @param {string} [options.model]     Model identifier (default: 'Xenova/yolos-tiny')
+   * @param {string} [options.mode]      'process' | 'thread' | 'socket' | 'grpc' (default: 'process')
+   * @param {string} [options.device]    'cpu' | 'gpu' | 'auto' (default: 'auto')
+   * @param {string} [options.provider]  'cpu' | 'cuda' | 'dml'
+   * @param {string|null} [options.label]    Class label to keep (default: 'person'; pass null for all classes)
+   * @param {number} [options.threshold]     Score threshold (default: 0.5)
+   * @param {number} [options.concurrency]   Parallel workers (default: 1)
+   * @param {string} [options.cacheDir]      Model cache directory (default: ~/.seedeer/models)
+   * @param {Array}  [options.servers]       For 'socket'/'grpc' modes: server addresses to round-robin across.
    * @returns {Promise<Detector>}
    */
   static async create(options = {}) {
-    throw new NotImplementedError('Detector', 'Phase 4 (see docs/ROADMAP.md)');
+    const {
+      model = 'Xenova/yolos-tiny',
+      mode = 'process',
+      device = 'auto',
+      provider,
+      label = 'person',
+      threshold = 0.5,
+      concurrency = 1,
+      cacheDir,
+      dtype,
+      servers,
+    } = options;
+
+    const pool = new WorkerPool(ENGINE_PATH, {
+      mode,
+      concurrency,
+      servers,
+      engineOptions: { modelName: model, device, provider, cacheDir, dtype },
+    });
+    await pool.initialize();
+    return new Detector(pool, label, threshold);
   }
 
   /**
-   * @param {Buffer} frame  A single decoded video frame
+   * @param {Buffer|string} frame  A single decoded video frame (path/URL/Buffer)
    * @returns {Promise<Array<{ x: number, y: number, width: number, height: number, score: number }>>}
    */
   async detect(frame) {
-    throw new NotImplementedError('Detector.detect', 'Phase 4 (see docs/ROADMAP.md)');
+    return this.#pool.run({ type: 'detect', frame, label: this.#label, threshold: this.#threshold });
   }
 
   async destroy() {
-    throw new NotImplementedError('Detector.destroy', 'Phase 4 (see docs/ROADMAP.md)');
+    await this.#pool.destroy();
   }
 }

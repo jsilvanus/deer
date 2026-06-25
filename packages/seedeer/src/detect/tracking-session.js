@@ -1,5 +1,7 @@
 import { EventEmitter } from 'node:events';
-import { NotImplementedError } from '../errors.js';
+import { Detector } from './detector.js';
+import { Tracker } from './tracker.js';
+import { ZoneTrigger } from './zone-trigger.js';
 
 /**
  * Session-shaped API tying Detector + Tracker + ZoneTrigger together:
@@ -9,25 +11,45 @@ import { NotImplementedError } from '../errors.js';
  * session-shaped rather than call/return like the others.
  */
 export class TrackingSession extends EventEmitter {
+  #detector;
+  #tracker;
+  #zoneTrigger;
+
+  constructor(detector, tracker, zoneTrigger) {
+    super();
+    this.#detector = detector;
+    this.#tracker = tracker;
+    this.#zoneTrigger = zoneTrigger;
+  }
+
   /**
    * @param {object} options
-   * @param {object} options.detector                    Detector.create() options
-   * @param {Array<{ id: string, polygon: Array<[number, number]> }>} options.zones
+   * @param {object} [options.detector]                   Detector.create() options
+   * @param {object} [options.tracker]                     Tracker constructor options
+   * @param {Array<{ id: string, polygon?: Array<[number, number]>, rect?: object }>} [options.zones]
    * @returns {Promise<TrackingSession>}
    */
   static async create(options = {}) {
-    throw new NotImplementedError('TrackingSession', 'Phase 4 (see docs/ROADMAP.md)');
+    const detector = await Detector.create(options.detector);
+    const tracker = new Tracker(options.tracker);
+    const zoneTrigger = new ZoneTrigger(options.zones ?? []);
+    return new TrackingSession(detector, tracker, zoneTrigger);
   }
 
   /**
-   * @param {Buffer} frame  A single decoded video frame
+   * @param {Buffer|string} frame  A single decoded video frame
    * @returns {Promise<void>}  Emits 'zoneEnter'/'zoneExit' as a side effect
    */
   async pushFrame(frame) {
-    throw new NotImplementedError('TrackingSession.pushFrame', 'Phase 4 (see docs/ROADMAP.md)');
+    const detections = await this.#detector.detect(frame);
+    const trackedBoxes = this.#tracker.update(detections);
+    const events = this.#zoneTrigger.evaluate(trackedBoxes);
+    for (const event of events) {
+      this.emit(event.type, { ...event, frame });
+    }
   }
 
   async destroy() {
-    throw new NotImplementedError('TrackingSession.destroy', 'Phase 4 (see docs/ROADMAP.md)');
+    await this.#detector.destroy();
   }
 }

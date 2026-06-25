@@ -11,7 +11,7 @@ VQA: no question is asked, the output is a fixed-style description.
 ```js
 import { Captioner } from '@jsilvanus/seedeer';
 
-const captioner = await Captioner.create('Xenova/blip-image-captioning-base', {
+const captioner = await Captioner.create('Xenova/vit-gpt2-image-captioning', {
   mode: 'process',
   device: 'auto',
 });

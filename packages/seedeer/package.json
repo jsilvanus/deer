@@ -13,8 +13,10 @@
   },
   "scripts": {
     "test": "node --test test/*.test.js",
+    "test:live": "node --test test/live/*.test.js",
     "daemon": "node src/socket-model-server.js",
-    "server": "node src/grpc-model-server.js"
+    "server": "node src/grpc-model-server.js",
+    "bench": "node bench/embed.bench.js && node bench/caption.bench.js && node bench/vqa.bench.js && node bench/detect.bench.js"
   },
   "keywords": [
     "vision",

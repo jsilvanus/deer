@@ -1,32 +1,80 @@
-import { NotImplementedError } from '../errors.js';
+import { WorkerPool } from '../shared/worker-pool.js';
+
+const ENGINE_PATH = new URL('./caption-engine.js', import.meta.url).href;
+
+function chunk(array, size) {
+  const out = [];
+  for (let i = 0; i < array.length; i += size) out.push(array.slice(i, i + size));
+  return out;
+}
 
 /**
- * Generic image captioning (BLIP-class models). Fixed-style descriptions,
- * not question-driven — see VqaAssistant for that. See
+ * Generic image captioning (image-to-text models). Fixed-style
+ * descriptions, not question-driven — see VqaAssistant for that. See
  * docs/features/captioning.md.
  */
 export class Captioner {
+  #pool;
+  #batchSize;
+  #maxNewTokens;
+
+  constructor(pool, batchSize, maxNewTokens) {
+    this.#pool = pool;
+    this.#batchSize = batchSize;
+    this.#maxNewTokens = maxNewTokens;
+  }
+
   /**
-   * @param {string} modelName          Hugging Face model identifier
+   * @param {string} modelName              Hugging Face model identifier
    * @param {object} [options]
-   * @param {string} [options.mode]     'process' | 'thread' | 'socket' | 'grpc' (default: 'process')
-   * @param {string} [options.device]   'cpu' | 'gpu' | 'auto' (default: 'cpu')
-   * @param {string} [options.provider] 'cpu' | 'cuda' | 'dml'
+   * @param {string} [options.mode]         'process' | 'thread' | 'socket' | 'grpc' (default: 'process')
+   * @param {string} [options.device]       'cpu' | 'gpu' | 'auto' (default: 'auto')
+   * @param {string} [options.provider]     'cpu' | 'cuda' | 'dml'
+   * @param {number} [options.batchSize]    Images per worker task (default: 8)
+   * @param {number} [options.concurrency]  Parallel workers (default: 2)
+   * @param {number} [options.maxNewTokens] Generation length cap (default: 50)
+   * @param {string} [options.cacheDir]     Model cache directory (default: ~/.seedeer/models)
+   * @param {Array}  [options.servers]      For 'socket'/'grpc' modes: server addresses to round-robin across.
    * @returns {Promise<Captioner>}
    */
   static async create(modelName, options = {}) {
-    throw new NotImplementedError('Captioner', 'Phase 2 (see docs/ROADMAP.md)');
+    const {
+      mode = 'process',
+      device = 'auto',
+      provider,
+      batchSize = 8,
+      concurrency = 2,
+      maxNewTokens = 50,
+      cacheDir,
+      dtype,
+      servers,
+    } = options;
+
+    const pool = new WorkerPool(ENGINE_PATH, {
+      mode,
+      concurrency,
+      servers,
+      engineOptions: { modelName, device, provider, cacheDir, dtype },
+    });
+    await pool.initialize();
+    return new Captioner(pool, batchSize, maxNewTokens);
   }
 
   /**
-   * @param {Array<string|Buffer>} images  File paths or image buffers
-   * @returns {Promise<string[]>}          One caption per input image
+   * @param {Array<string|Buffer>} images  File paths/URLs or image buffers
+   * @returns {Promise<string[]>}          One caption per input image, same order
    */
   async caption(images) {
-    throw new NotImplementedError('Captioner.caption', 'Phase 2 (see docs/ROADMAP.md)');
+    const batches = chunk(images, this.#batchSize);
+    const results = await Promise.all(
+      batches.map((batchImages) =>
+        this.#pool.run({ type: 'caption', images: batchImages, maxNewTokens: this.#maxNewTokens }),
+      ),
+    );
+    return results.flat();
   }
 
   async destroy() {
-    throw new NotImplementedError('Captioner.destroy', 'Phase 2 (see docs/ROADMAP.md)');
+    await this.#pool.destroy();
   }
 }
