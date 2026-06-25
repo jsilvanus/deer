@@ -1,0 +1,57 @@
+# seedeer
+
+A Node.js vision-model toolkit — the vision counterpart to
+[`@jsilvanus/embedeer`](https://github.com/jsilvanus/embedeer) (text
+embeddings) and [`@jsilvanus/chattydeer`](https://github.com/jsilvanus/chattydeer)
+(LLM chat). Import it directly with no HTTP server in the loop; local or
+remote model execution is a configuration detail, not an API difference.
+
+> **Status: all roadmap phases complete.** Image embeddings
+> (`JointEmbedder`, `VisualEmbedder`), captioning (`Captioner`), VQA
+> (`VqaAssistant`, local and remote backends), and detect/track/zone-trigger
+> (`Detector`, `Tracker`, `ZoneTrigger`, `TrackingSession`) are all real
+> and working, across all four execution modes
+> (`process`/`thread`/`socket`/`grpc`) where applicable, with per-pillar
+> benchmark scripts (`npm run bench`) and multi-server load balancing for
+> the network modes. See
+> [`docs/ROADMAP.md`](docs/ROADMAP.md) for what's coming and in what order,
+> and [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the design
+> principles behind it.
+
+## Planned functionality
+
+| Pillar | What it does | Doc |
+|---|---|---|
+| Image embeddings ✅ | Joint image-text (CLIP-class) and vision-only (DINOv2-class) embeddings | [docs/features/embeddings.md](docs/features/embeddings.md) |
+| Captioning ✅ | Cheap, fast, generic image descriptions | [docs/features/captioning.md](docs/features/captioning.md) |
+| Visual Question Answering ✅ | Question-driven answers about an image, local or delegated to a remote OpenAI-compatible vision endpoint | [docs/features/vqa.md](docs/features/vqa.md) |
+| Detect + Track + Zone-trigger ✅ | Real-time person detection, cross-frame tracking, and named-zone enter/exit events for production-assistant use cases | [docs/features/detection-tracking.md](docs/features/detection-tracking.md) |
+
+OCR and image redaction/pixel mutation are explicit non-goals — see
+`docs/ARCHITECTURE.md`.
+
+## Design principles (short version)
+
+1. No HTTP in the consuming product — `import` and call a method.
+2. Every pillar supports local-or-remote execution (`process` / `thread` /
+   `socket` / `grpc`), including the real-time detection/tracking path.
+3. Where model strength matters more than latency (VQA), the backend is
+   pluggable: a small local model by default, or delegation to a
+   configured remote endpoint — the call shape never changes.
+4. Reuses embedeer's proven worker-pool/provider-loader/server patterns
+   rather than reinventing them for vision inputs.
+5. No tight coupling to any specific downstream consumer.
+
+Full rationale in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+
+## Installation
+
+```bash
+npm install @jsilvanus/seedeer
+```
+
+(Not yet published to npm.)
+
+## License
+
+MIT

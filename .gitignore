@@ -1,0 +1,31 @@
+node_modules/
+
+# Build output
+dist/
+builds/
+
+# Coverage tools
+coverage/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+
+# Environment variables
+.env
+.env*
+
+# VSCode settings
+.vscode/
+
+# Packaged tarballs
+*.tgz
+
+# Bench results (generated at runtime)
+bench/grid-results*.json
+bench/results/
+
+# Gitsema
+.gitsema/

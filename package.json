@@ -1,0 +1,19 @@
+{
+  "name": "deer",
+  "version": "0.0.0",
+  "private": true,
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "pnpm -r --if-present run build",
+    "test": "pnpm -r run test",
+    "lint": "eslint ."
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.29.7",
+    "eslint": "^10.5.0",
+    "typescript-eslint": "^8.62.0"
+  }
+}

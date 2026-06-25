@@ -1,0 +1,73 @@
+{
+  "name": "@jsilvanus/embedeer",
+  "version": "1.7.3",
+  "description": "A node.js embedding tool with optional GPU acceleration",
+  "main": "src/index.js",
+  "types": "src/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./src/index.js",
+      "types": "./src/index.d.ts"
+    }
+  },
+  "bin": {
+    "embedeer": "src/cli.js"
+  },
+  "files": [
+    "src",
+    "README.md",
+    "bench/compare.js",
+    "bench/grid-search.js",
+    "bench/ollama-bench.js",
+    "bench/validate-embeddings.js",
+    "bench/texts-100.txt",
+    "bench/texts-1000.txt"
+  ],
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "coverage": "c8 node --test test/*.test.js",
+    "benchmark": "node bench/compare.js",
+    "server-bench": "node bench/server-bench.js",
+    "daemon": "node src/socket-model-server.js",
+    "server": "node src/grpc-model-server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jsilvanus/embedeer.git"
+  },
+  "keywords": [
+    "embeddings",
+    "huggingface",
+    "nlp",
+    "transformers",
+    "parallel",
+    "gpu",
+    "cuda",
+    "onnxruntime"
+  ],
+  "author": "jsilvanus",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "bugs": {
+    "url": "https://github.com/jsilvanus/embedeer/issues"
+  },
+  "homepage": "https://github.com/jsilvanus/embedeer#readme",
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@huggingface/transformers": "^4.0.1"
+  },
+  "optionalDependencies": {
+    "@grpc/grpc-js": "^1.14.3",
+    "@grpc/proto-loader": "^0.8.0"
+  },
+  "devDependencies": {
+    "@types/node": "^25.5.2",
+    "c8": "^8.0.1",
+    "typescript": "^6.0.2"
+  }
+}
