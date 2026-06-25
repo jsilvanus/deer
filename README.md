@@ -2,7 +2,8 @@
 
 A pnpm workspace monorepo for the deer family of Node.js packages:
 
-- [`packages/seedeer`](packages/seedeer) — [`@jsilvanus/seedeer`](packages/seedeer/README.md): vision-model toolkit (detection/tracking, VQA, captioning, image embeddings).
+- [`packages/nudeer`](packages/nudeer) — [`@jsilvanus/nudeer`](packages/nudeer/README.md): Generic worker pool and model server infrastructure (shared by seedeer and other model-serving packages).
+- [`packages/seedeer`](packages/seedeer) — [`@jsilvanus/seedeer`](packages/seedeer/README.md): Vision-model toolkit (detection/tracking, VQA, captioning, image embeddings).
 - [`packages/embedeer`](packages/embedeer) — [`@jsilvanus/embedeer`](packages/embedeer/README.md): Node.js text embedding tool with optional GPU acceleration.
 - [`packages/chattydeer`](packages/chattydeer) — [`@jsilvanus/chattydeer`](packages/chattydeer/README.md): LLM chat completions, deterministic explanations, and agentic tool-calling, built on `embedeer`.
 

@@ -24,7 +24,8 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jsilvanus/chattydeer.git"
+    "url": "git+https://github.com/jsilvanus/deer.git",
+    "directory": "packages/chattydeer"
   },
   "keywords": [
     "llm",
@@ -42,9 +43,9 @@
     "node": ">=20"
   },
   "bugs": {
-    "url": "https://github.com/jsilvanus/chattydeer/issues"
+    "url": "https://github.com/jsilvanus/deer/issues"
   },
-  "homepage": "https://github.com/jsilvanus/chattydeer#readme",
+  "homepage": "https://github.com/jsilvanus/deer/tree/main/packages/chattydeer#readme",
   "publishConfig": {
     "access": "public",
     "provenance": true
