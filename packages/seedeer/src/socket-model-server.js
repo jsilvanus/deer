@@ -2,8 +2,7 @@
 import fs from 'node:fs';
 import net from 'node:net';
 import readline from 'node:readline';
-import { createModelServerCore } from './shared/model-server-core.js';
-import { defaultSocketPath } from './shared/socket-client.js';
+import { createModelServerCore, defaultSocketPath } from '@jsilvanus/nudeer';
 
 /**
  * Starts a persistent socket daemon hosting a single seedeer engine,

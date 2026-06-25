@@ -1,5 +1,4 @@
-import { resolveDevice } from '../shared/provider-loader.js';
-import { defaultCacheDir } from '../shared/cache-dir.js';
+import { resolveDevice, defaultCacheDir } from '@jsilvanus/nudeer';
 import { loadRawImage } from '../shared/image-input.js';
 
 /**
@@ -10,7 +9,7 @@ import { loadRawImage } from '../shared/image-input.js';
 export async function createEngine({ modelName, device, provider, cacheDir, dtype }) {
   const { pipeline } = await import('@huggingface/transformers');
   const resolvedDevice = resolveDevice({ device, provider });
-  const cache_dir = cacheDir ?? defaultCacheDir();
+  const cache_dir = cacheDir ?? defaultCacheDir('seedeer');
 
   const captioner = await pipeline('image-to-text', modelName, {
     cache_dir,

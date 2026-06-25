@@ -1,0 +1,46 @@
+{
+  "name": "@jsilvanus/nudeer",
+  "version": "0.1.0",
+  "description": "Generic worker pool and model server infrastructure for embeddings, vision, and other model types. Supports process, thread, socket, and gRPC execution modes.",
+  "type": "module",
+  "main": "src/index.js",
+  "types": "src/index.d.ts",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.js"
+  },
+  "keywords": [
+    "worker-pool",
+    "worker-threads",
+    "grpc",
+    "socket-server",
+    "model-server",
+    "embeddings",
+    "vision",
+    "inference"
+  ],
+  "license": "MIT",
+  "author": "jsilvanus",
+  "engines": {
+    "node": ">=18"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {},
+  "optionalDependencies": {
+    "@grpc/grpc-js": "^1.10.0",
+    "@grpc/proto-loader": "^0.7.0"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jsilvanus/deer.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jsilvanus/deer/issues"
+  },
+  "homepage": "https://github.com/jsilvanus/deer#readme"
+}

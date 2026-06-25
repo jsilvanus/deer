@@ -1,4 +1,4 @@
-import { WorkerPool } from '../shared/worker-pool.js';
+import { WorkerPool } from '@jsilvanus/nudeer';
 import { chunk } from '../shared/chunk.js';
 
 const ENGINE_PATH = new URL('./embed-engine.js', import.meta.url).href;

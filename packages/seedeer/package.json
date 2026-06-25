@@ -41,6 +41,7 @@
     "access": "public"
   },
   "dependencies": {
+    "@jsilvanus/nudeer": "workspace:*",
     "@huggingface/transformers": "^3.0.0",
     "onnxruntime-node": "^1.19.0"
   },
