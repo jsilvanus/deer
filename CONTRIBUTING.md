@@ -279,6 +279,16 @@ Handled by `.github/workflows/release.yml` — no manual steps needed except `pn
 
 Each package publishes independently (no linked versioning).
 
+### Repository Configuration Required
+
+For the release workflow to create pull requests, GitHub Actions must have the proper permissions:
+
+1. Go to repository **Settings** → **Actions** → **General**
+2. Under "Workflow permissions", select **"Read and write permissions"**
+3. Check **"Allow GitHub Actions to create and approve pull requests"**
+
+Without these settings, the release workflow will fail when trying to create the "Version Packages" PR.
+
 ---
 
 ## Questions?
