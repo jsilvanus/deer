@@ -1,12 +1,7 @@
 import { WorkerPool } from '../shared/worker-pool.js';
+import { chunk } from '../shared/chunk.js';
 
 const ENGINE_PATH = new URL('./embed-engine.js', import.meta.url).href;
-
-function chunk(array, size) {
-  const out = [];
-  for (let i = 0; i < array.length; i += size) out.push(array.slice(i, i + size));
-  return out;
-}
 
 /**
  * Vision-only embedder (DINOv2-class models). Not comparable to text

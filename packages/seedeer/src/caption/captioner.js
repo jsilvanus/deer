@@ -1,12 +1,7 @@
 import { WorkerPool } from '../shared/worker-pool.js';
+import { chunk } from '../shared/chunk.js';
 
 const ENGINE_PATH = new URL('./caption-engine.js', import.meta.url).href;
-
-function chunk(array, size) {
-  const out = [];
-  for (let i = 0; i < array.length; i += size) out.push(array.slice(i, i + size));
-  return out;
-}
 
 /**
  * Generic image captioning (image-to-text models). Fixed-style

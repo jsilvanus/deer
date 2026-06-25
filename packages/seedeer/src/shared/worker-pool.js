@@ -40,8 +40,8 @@ export class WorkerPool {
   #pending = new Map();
   #remoteClients = null;
   #remoteIndex = 0;
-  #ready = false;
   #initPromise = null;
+  #destroyed = false;
 
   /**
    * @param {string} enginePath               Absolute path/module specifier for the engine module.
@@ -64,9 +64,10 @@ export class WorkerPool {
   }
 
   async initialize() {
-    if (this.#ready) return;
-    // Concurrent callers may race in before #ready flips; memoize the
-    // in-flight promise so we never spawn workers/connections twice.
+    this.#destroyed = false;
+    // Concurrent callers may race in before the promise settles; memoize
+    // it so we never spawn workers/connections twice. Awaiting an
+    // already-resolved promise is just as cheap as a boolean check.
     if (!this.#initPromise) {
       this.#initPromise = this.#doInitialize();
     }
@@ -81,7 +82,6 @@ export class WorkerPool {
     } else {
       this.#remoteClients = await connectGrpcClients(this.#servers);
     }
-    this.#ready = true;
   }
 
   async run(task) {
@@ -104,13 +104,18 @@ export class WorkerPool {
   }
 
   async destroy() {
+    this.#destroyed = true;
+    // If initialize() is still in flight, let it finish spawning/connecting
+    // before tearing down — otherwise those workers/connections would be
+    // created after destroy() returns and leak.
+    if (this.#initPromise) await this.#initPromise;
+    if (!this.#destroyed) return; // re-initialized concurrently; nothing to tear down
     if (this.#remoteClients) {
       await Promise.all(this.#remoteClients.map((c) => c.close()));
       this.#remoteClients = null;
     }
     await Promise.all(this.#workers.map((record) => this.#destroyWorker(record)));
     this.#workers = [];
-    this.#ready = false;
     this.#initPromise = null;
   }
 

@@ -25,8 +25,9 @@ export async function createEngine({ modelName, device, provider, cacheDir, dtyp
       }
       const images = await Promise.all(task.images.map(loadRawImage));
       const outputs = await captioner(images, { max_new_tokens: task.maxNewTokens ?? 50 });
+      const isBatched = Array.isArray(outputs[0]);
       return images.map((_, i) => {
-        const out = Array.isArray(outputs[0]) ? outputs[i] : [outputs[i]];
+        const out = isBatched ? outputs[i] : [outputs[i]];
         return out[0].generated_text.trim();
       });
     },
