@@ -9,6 +9,10 @@ permissions:
   pull-requests: write
   id-token: write
 
+# Allow Actions to create PRs (required for Changesets)
+# See: https://github.com/orgs/community/discussions/25305
+# This requires the repository settings to allow Actions to create PRs
+
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -29,5 +33,7 @@ jobs:
       - uses: changesets/action@v1
         with:
           publish: pnpm changeset publish
+          commit: 'chore(release): version packages'
+          title: 'chore(release): version packages'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
