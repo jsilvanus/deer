@@ -37,6 +37,9 @@
   "engines": {
     "node": ">=18"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "@huggingface/transformers": "^3.0.0",
     "onnxruntime-node": "^1.19.0"

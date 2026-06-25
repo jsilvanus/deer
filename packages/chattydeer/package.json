@@ -54,7 +54,6 @@
     "@jsilvanus/embedeer": "workspace:*"
   },
   "devDependencies": {
-    "@changesets/cli": "^2.31.0",
     "@types/node": "^20.8.0",
     "c8": "^8.0.1",
     "typescript": "^5.3.0"
