@@ -1,4 +1,9 @@
+const tseslint = require('typescript-eslint');
+
 module.exports = [
+  {
+    ignores: ['**/node_modules/**', '**/dist/**', '**/coverage/**', '**/bench/results/**'],
+  },
   {
     files: ['**/*.{js,mjs,cjs}'],
     languageOptions: {
@@ -8,7 +13,6 @@ module.exports = [
         performance: 'readonly',
       },
     },
-    plugins: {},
     rules: {
       'no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
       'no-console': 'off',
@@ -19,9 +23,17 @@ module.exports = [
     },
   },
   {
-    files: ['test/**'],
+    files: ['**/test/**'],
     rules: {
       'no-unused-vars': 'off',
     },
   },
+  ...tseslint.config({
+    files: ['packages/chattydeer/src/**/*.ts'],
+    extends: [tseslint.configs.recommended],
+    rules: {
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
+    },
+  }),
 ];
