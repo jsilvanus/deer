@@ -218,7 +218,7 @@ function printTable(results) {
     const ratioStr = ratio < 1.005 ? '(fastest)' : `(${ratio.toFixed(2)}x slower)`;
     console.log(
       pad(r.label, COL.label)                         + ' │ ' +
-      lpad(r.startupMs != null ? fmt(r.startupMs) : '—', COL.startup) + ' │ ' +
+      lpad(r.startupMs !== null && r.startupMs !== undefined ? fmt(r.startupMs) : '—', COL.startup) + ' │ ' +
       lpad(fmt(r.embedMs), COL.time)                  + ' │ ' +
       lpad(tps(r.embedMs), COL.tps)                   + ' │ ' +
       lpad(r.dims ?? '?', COL.dims)                   +
