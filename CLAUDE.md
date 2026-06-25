@@ -11,6 +11,7 @@ Each package has its own `CLAUDE.md` with package-specific architecture, command
 
 - [`packages/nudeer/CLAUDE.md`](packages/nudeer/CLAUDE.md)
 - [`packages/embedeer/CLAUDE.md`](packages/embedeer/CLAUDE.md)
+- [`packages/seedeer/CLAUDE.md`](packages/seedeer/CLAUDE.md)
 - [`packages/chattydeer/CLAUDE.md`](packages/chattydeer/CLAUDE.md)
 
 Read the relevant package's `CLAUDE.md` before working inside that package's directory.
