@@ -52,10 +52,11 @@
   "devDependencies": {},
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jsilvanus/seedeer.git"
+    "url": "git+https://github.com/jsilvanus/deer.git",
+    "directory": "packages/seedeer"
   },
   "bugs": {
-    "url": "https://github.com/jsilvanus/seedeer/issues"
+    "url": "https://github.com/jsilvanus/deer/issues"
   },
-  "homepage": "https://github.com/jsilvanus/seedeer#readme"
+  "homepage": "https://github.com/jsilvanus/deer/tree/main/packages/seedeer#readme"
 }

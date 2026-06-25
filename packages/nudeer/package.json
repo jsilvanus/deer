@@ -37,7 +37,8 @@
   "devDependencies": {},
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jsilvanus/deer.git"
+    "url": "git+https://github.com/jsilvanus/deer.git",
+    "directory": "packages/nudeer"
   },
   "bugs": {
     "url": "https://github.com/jsilvanus/deer/issues"
