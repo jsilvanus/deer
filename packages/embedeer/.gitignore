@@ -1,0 +1,33 @@
+#Ignore NPM modules etc.
+node_modules/
+
+# Ignore build output
+dist/
+builds/
+
+# Ignore PNPM files
+pnpm*
+
+# Ignore VSCode settings
+.vscode/
+
+# Coverage tools
+coverage/
+
+# ignore log files
+*.log
+
+# Ignore environment variables
+.env
+
+# Grid-search results
+bench/grid-results*.json
+
+# Bench results directory (generated at runtime)
+bench/results/
+
+# Packaged tarballs
+*.tgz
+
+# Gitsema
+.gitsema/
