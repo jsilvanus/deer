@@ -33,25 +33,22 @@ npm run server               # node src/grpc-model-server.js
 
 ## Architecture
 
-Embedeer uses a **WorkerPool pattern** to distribute embedding work across configurable worker types:
+Embedeer uses nudeer's generic **WorkerPool** to distribute embedding work across configurable execution modes:
 
 ```
 embed(texts)
-  └─ split into batches → WorkerPool
-       ├─ process  → ChildProcessWorker (isolated child processes, each owns model copy)
-       ├─ thread   → ThreadWorker (worker_threads, each owns model copy)
-       ├─ socket   → SocketWorker → socket-model-server (one shared model via IPC)
-       └─ grpc     → GrpcWorker → grpc-model-server (one shared model via HTTP/2)
+  └─ split into batches → WorkerPool (from @jsilvanus/nudeer)
+       ├─ process  → isolated child processes, each loads embedding-engine module
+       ├─ thread   → worker_threads in same process, each loads embedding-engine
+       ├─ socket   → connects to socket-model-server daemon (shared model via IPC)
+       └─ grpc     → connects to grpc-model-server daemon (shared model via HTTP/2)
 ```
 
 **Key files:**
 - `src/index.js` — Public API exports
 - `src/index.d.ts` — TypeScript type definitions
 - `src/embedder.js` — High-level `Embedder` class (main user-facing API)
-- `src/worker-pool.js` — Pool orchestration; selects and manages workers
-- `src/worker.js` — Base Worker class
-- `src/child-process-worker.js` — Spawns isolated child processes
-- `src/thread-worker.js` / `src/thread-worker-script.js` — Worker thread implementation
+- `src/embedding-engine.js` — Engine module loaded by nudeer's WorkerPool (exports `createEngine()`)
 - `src/socket-model-server.js` — Unix socket / named pipe daemon
 - `src/grpc-model-server.js` — gRPC server (uses `@grpc/grpc-js`, lazy-loaded)
 - `src/model-cache.js` — Cache directory resolution and pipeline options

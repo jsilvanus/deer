@@ -14,9 +14,6 @@
  */
 
 export { Embedder } from './embedder.js';
-export { WorkerPool } from './worker-pool.js';
-export { ChildProcessWorker } from './child-process-worker.js';
-export { ThreadWorker } from './thread-worker.js';
 export { getCacheDir, DEFAULT_CACHE_DIR, buildPipelineOptions } from './model-cache.js';
 
 /**
@@ -36,7 +33,7 @@ export async function loadModel(modelName, options) {
 export { isModelDownloaded, listModels, downloadModel, prepareModel, ensureModel, deleteModel, getCachedModels, importLocalModel } from './model-management.js'
 
 // Runtime: models currently loaded into worker pools
-export { getLoadedModels } from './runtime-models.js'
+export { getLoadedModels, registerLoadedModel, unregisterLoadedModel } from './runtime-models.js'
 
 // Provider resolution (used by chattydeer and other packages that build on embedeer)
 export { resolveProvider } from './provider-loader.js'

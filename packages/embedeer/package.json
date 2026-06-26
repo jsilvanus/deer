@@ -60,6 +60,7 @@
     "access": "public"
   },
   "dependencies": {
+    "@jsilvanus/nudeer": "workspace:*",
     "@huggingface/transformers": "^4.0.1"
   },
   "optionalDependencies": {

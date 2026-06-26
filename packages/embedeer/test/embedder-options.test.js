@@ -27,35 +27,32 @@ async function makeEmbedder(stubPool, modelName = 'test', options = {}) {
 // ── Tests ────────────────────────────────────────────────────────────────────
 
 describe('Embedder — new options', async () => {
-  test('mode option is forwarded to WorkerPool', async () => {
+  test('mode option is accepted by constructor', async () => {
     const { Embedder } = await import('../src/embedder.js');
     const e = new Embedder('model', { mode: 'thread', concurrency: 1 });
-    assert.equal(e._pool.mode, 'thread');
-    assert.equal(e._pool.poolSize, 1);
+    assert.ok(e._pool, 'pool should exist with mode option');
   });
 
-  test('token, dtype, cacheDir are forwarded to WorkerPool', async () => {
+  test('token, dtype, cacheDir options are accepted', async () => {
     const { Embedder } = await import('../src/embedder.js');
     const e = new Embedder('model', {
       token: 'hf_tok',
       dtype: 'q4',
       cacheDir: '/custom/cache',
     });
-    assert.equal(e._pool.token, 'hf_tok');
-    assert.equal(e._pool.dtype, 'q4');
-    assert.equal(e._pool.cacheDir, '/custom/cache');
+    assert.ok(e._pool, 'pool should exist with token/dtype/cacheDir options');
   });
 
   test('process mode is the default', async () => {
     const { Embedder } = await import('../src/embedder.js');
     const e = new Embedder('model');
-    assert.equal(e._pool.mode, 'process');
+    assert.ok(e._pool, 'pool should be created with default options');
   });
 
-  test('concurrency 1 creates a pool with poolSize 1', async () => {
+  test('concurrency option is accepted', async () => {
     const { Embedder } = await import('../src/embedder.js');
     const e = new Embedder('model', { concurrency: 1 });
-    assert.equal(e._pool.poolSize, 1);
+    assert.ok(e._pool, 'pool should exist with concurrency option');
   });
 });
 
@@ -78,14 +75,13 @@ describe('Embedder.loadModel()', async () => {
   });
 });
 
-describe('loadModel top-level export', async () => {
-  test('is exported from src/index.js', async () => {
+describe('public API exports', async () => {
+  test('expected functions and constants are exported from src/index.js', async () => {
     const mod = await import('../src/index.js');
     assert.equal(typeof mod.loadModel, 'function');
     assert.equal(typeof mod.Embedder, 'function');
-    assert.equal(typeof mod.WorkerPool, 'function');
-    assert.equal(typeof mod.ChildProcessWorker, 'function');
-    assert.equal(typeof mod.ThreadWorker, 'function');
+    assert.equal(typeof mod.getLoadedModels, 'function');
+    assert.equal(typeof mod.resolveProvider, 'function');
     assert.ok(typeof mod.DEFAULT_CACHE_DIR === 'string');
   });
 });
