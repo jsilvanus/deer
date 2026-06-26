@@ -24,7 +24,7 @@ remote model execution is a configuration detail, not an API difference.
 
 | Pillar | What it does | Doc |
 |---|---|---|
-| Image embeddings ✅ | Joint image-text (CLIP-class) and vision-only (DINOv2-class) embeddings | [docs/features/embeddings.md](docs/features/embeddings.md) |
+| Image embeddings ✅ | Joint image-text (CLIP-class) and vision-only (DINOv3-class) embeddings | [docs/features/embeddings.md](docs/features/embeddings.md) |
 | Captioning ✅ | Cheap, fast, generic image descriptions | [docs/features/captioning.md](docs/features/captioning.md) |
 | Visual Question Answering ✅ | Question-driven answers about an image, local or delegated to a remote OpenAI-compatible vision endpoint | [docs/features/vqa.md](docs/features/vqa.md) |
 | Detect + Track + Zone-trigger ✅ | Real-time person detection, cross-frame tracking, and named-zone enter/exit events for production-assistant use cases | [docs/features/detection-tracking.md](docs/features/detection-tracking.md) |

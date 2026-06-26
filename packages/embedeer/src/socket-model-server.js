@@ -40,7 +40,7 @@ import { resolveProvider } from './provider-loader.js';
 const { values: args } = parseArgs({
   args: process.argv.slice(2),
   options: {
-    model:          { type: 'string',  default: 'Xenova/all-MiniLM-L6-v2' },
+    model:          { type: 'string',  default: 'onnx-community/gte-multilingual-base' },
     socket:         { type: 'string' },
     pooling:        { type: 'string',  default: 'mean' },
     normalize:      { type: 'boolean', default: true },

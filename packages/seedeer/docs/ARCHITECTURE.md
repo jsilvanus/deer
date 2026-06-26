@@ -63,7 +63,7 @@ These carry over directly from embedeer and apply to every feature below.
 
 | Pillar | Latency need | Backend choice | Model class |
 |---|---|---|---|
-| Detect + Track + Zone-trigger | Near-instantaneous (frame-rate) | local by default, remote-capable for symmetry | small/fast detector (YOLO-nano class) + lightweight tracker |
+| Detect + Track + Zone-trigger | Near-instantaneous (frame-rate) | local by default, remote-capable for symmetry | small/fast detector (RT-DETR-class) + lightweight tracker |
 | Visual Question Answering | Tolerant | pluggable (local small VLM, or remote/Ollama-compatible) | vision-language model |
 | Captioning | Tolerant, but cheap | local by default | small captioning model (BLIP-class) |
 | Image embeddings | Tolerant | local-or-remote, same as embedeer | two separate model families — see below |
@@ -85,7 +85,7 @@ call-and-return shape. See `docs/features/detection-tracking.md`.
 - **Joint image-text space** (CLIP/SigLIP-class): image and text vectors
   live in the same space, enabling cross-modal search (text query → image
   results, or vice versa).
-- **Vision-only space** (DINOv2-class): not comparable to text embeddings,
+- **Vision-only space** (DINOv3-class): not comparable to text embeddings,
   but generally stronger for pure image-to-image similarity, clustering, and
   near-duplicate detection than a CLIP image tower (which trades some visual
   fidelity for text alignment).

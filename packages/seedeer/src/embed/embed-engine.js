@@ -67,7 +67,7 @@ async function createVisualEngine({ modelName, device, provider, cacheDir, dtype
       const images = await Promise.all(task.images.map(loadRawImage));
       const inputs = await processor(images);
       const output = await model(inputs);
-      // DINOv2-class models expose only last_hidden_state ([n, seq, dim]);
+      // DINOv3-class models expose only last_hidden_state ([n, seq, dim]);
       // the CLS token (sequence index 0) is the conventional global image
       // representation. If a model exposes pooler_output directly, prefer it.
       const rows = output.pooler_output

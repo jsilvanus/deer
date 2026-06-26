@@ -3,7 +3,7 @@ import { WorkerPool } from '@jsilvanus/nudeer';
 const ENGINE_PATH = new URL('./detect-engine.js', import.meta.url).href;
 
 /**
- * Per-frame person detection (YOLOS-tiny-class ONNX model run through an
+ * Per-frame person detection (RT-DETR-class ONNX model run through an
  * object-detection pipeline, filtered to a single label by default). Fast,
  * stateless on its own — see TrackingSession for the stateful pipeline
  * built on top. See docs/features/detection-tracking.md.
@@ -21,7 +21,7 @@ export class Detector {
 
   /**
    * @param {object} [options]
-   * @param {string} [options.model]     Model identifier (default: 'Xenova/yolos-tiny')
+   * @param {string} [options.model]     Model identifier (default: 'onnx-community/rtdetr_r18vd')
    * @param {string} [options.mode]      'process' | 'thread' | 'socket' | 'grpc' (default: 'process')
    * @param {string} [options.device]    'cpu' | 'gpu' | 'auto' (default: 'auto')
    * @param {string} [options.provider]  'cpu' | 'cuda' | 'dml'
@@ -34,7 +34,7 @@ export class Detector {
    */
   static async create(options = {}) {
     const {
-      model = 'Xenova/yolos-tiny',
+      model = 'onnx-community/rtdetr_r18vd',
       mode = 'process',
       device = 'auto',
       provider,

@@ -41,7 +41,7 @@ than call-and-return.
 import { TrackingSession } from '@jsilvanus/seedeer';
 
 const session = await TrackingSession.create({
-  detector: { model: 'Xenova/yolos-tiny', mode: 'process', device: 'auto' }, // default if omitted
+  detector: { model: 'onnx-community/rtdetr_r18vd', mode: 'process', device: 'auto' }, // default if omitted
   // mode may also be 'grpc' pointed at a remote server — symmetry with
   // every other pillar — but 'process'/'thread' is the latency-sane default.
   zones: [

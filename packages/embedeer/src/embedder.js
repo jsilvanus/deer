@@ -7,7 +7,7 @@
  * @example
  * import { Embedder } from 'embedeer';
  *
- * const embedder = await Embedder.create('Xenova/all-MiniLM-L6-v2');
+ * const embedder = await Embedder.create('onnx-community/gte-multilingual-base');
  * const vectors = await embedder.embed(['Hello world', 'Foo bar']);
  * console.log(vectors); // [[0.12, ...], [0.34, ...]]
  * await embedder.destroy();
@@ -38,7 +38,7 @@ export class Embedder {
    * @param {string} [options.device]            Compute device: 'auto'|'cpu'|'gpu' (default: 'cpu')
    * @param {string} [options.provider]          Execution provider override: 'cpu'|'cuda'|'dml'
    */
-  constructor(modelName = 'nomic-embed-text', options = {}) {
+  constructor(modelName = 'onnx-community/gte-multilingual-base', options = {}) {
     this.modelName = modelName;
     // Determine sensible defaults based on host machine and requested device.
     const numCores = os.cpus()?.length ?? 1;
@@ -162,7 +162,7 @@ export class Embedder {
    * return a recommended config. This avoids relying on a precomputed
    * profile file and is useful on first-run or when profiles are absent.
    */
-  static async initialPerformanceCheckup({ device = 'cpu', sampleSize = 50, modelName = 'nomic-embed-text' } = {}) {
+  static async initialPerformanceCheckup({ device = 'cpu', sampleSize = 50, modelName = 'onnx-community/gte-multilingual-base' } = {}) {
     const numCores = os.cpus()?.length ?? 1;
     const tempOpts = { device, concurrency: 1, batchSize: device === 'gpu' ? 32 : 16, mode: device === 'gpu' ? 'process' : 'thread', applyPerfProfile: false };
     const embedder = new Embedder(modelName, tempOpts);
@@ -231,7 +231,7 @@ export class Embedder {
    *
    * Returns { best, savedPath }.
    */
-  static async generateAndSaveProfile({ mode = 'quick', device = 'cpu', sampleSize = 100, profileOut = null, modelName = 'nomic-embed-text' } = {}) {
+  static async generateAndSaveProfile({ mode = 'quick', device = 'cpu', sampleSize = 100, profileOut = null, modelName = 'onnx-community/gte-multilingual-base' } = {}) {
     let best;
     if (mode === 'grid') {
       // Run the bench/grid-search.js script and wait for it to finish.

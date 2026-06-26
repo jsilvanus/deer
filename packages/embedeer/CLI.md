@@ -18,7 +18,7 @@ Interactive / streaming line-reader:
   cat big.txt | npx @jsilvanus/embedeer --model <name> -i --output csv --dump out.csv
 
 Options:
-  -m, --model <name>           Hugging Face model (default: Xenova/all-MiniLM-L6-v2)
+  -m, --model <name>           Hugging Face model (default: onnx-community/gte-multilingual-base)
   -d, --data <text...>         Text(s) or JSON array to embed
       --file <path>            Input file: JSON array or delimited texts
   -D, --delimiter <str>        Record separator for stdin/file (default: \n)
@@ -64,14 +64,14 @@ The interactive mode opens a line-by-line reader that starts embedding as record
 
 ```bash
 # Open an interactive session (paste lines, Ctrl+D when done)
-npx @jsilvanus/embedeer --model Xenova/all-MiniLM-L6-v2 --interactive --dump embeddings.jsonl
+npx @jsilvanus/embedeer --model onnx-community/gte-multilingual-base --interactive --dump embeddings.jsonl
 
 # Stream a large file through interactive mode with CSV output
-cat big.txt | npx @jsilvanus/embedeer --model Xenova/all-MiniLM-L6-v2 \
+cat big.txt | npx @jsilvanus/embedeer --model onnx-community/gte-multilingual-base \
   --interactive --output csv --dump embeddings.csv
 
 # Interactive with GPU, custom batch size, txt output
-npx @jsilvanus/embedeer --model Xenova/all-MiniLM-L6-v2 \
+npx @jsilvanus/embedeer --model onnx-community/gte-multilingual-base \
   --interactive --device auto --batch-size 16 --output txt --dump vecs.txt
 ```
 
@@ -100,24 +100,24 @@ By default records in stdin and files are split on newline (`\n`). Use `--delimi
 
 ```bash
 # Newline-delimited (default)
-printf 'Hello\nWorld\n' | npx @jsilvanus/embedeer --model Xenova/all-MiniLM-L6-v2
+printf 'Hello\nWorld\n' | npx @jsilvanus/embedeer --model onnx-community/gte-multilingual-base
 
 # Null-byte delimited — safe with filenames/texts that contain newlines
-printf 'Hello\0World\0' | npx @jsilvanus/embedeer --model Xenova/all-MiniLM-L6-v2 --delimiter '\0'
+printf 'Hello\0World\0' | npx @jsilvanus/embedeer --model onnx-community/gte-multilingual-base --delimiter '\0'
 
 # Tab-delimited
-printf 'Hello\tWorld' | npx @jsilvanus/embedeer --model Xenova/all-MiniLM-L6-v2 --delimiter '\t'
+printf 'Hello\tWorld' | npx @jsilvanus/embedeer --model onnx-community/gte-multilingual-base --delimiter '\t'
 
 # Custom multi-character delimiter
-printf 'Hello|||World|||Foo' | npx @jsilvanus/embedeer --model Xenova/all-MiniLM-L6-v2 --delimiter '|||' 
+printf 'Hello|||World|||Foo' | npx @jsilvanus/embedeer --model onnx-community/gte-multilingual-base --delimiter '|||' 
 
 # File with null-byte delimiter
-npx @jsilvanus/embedeer --model Xenova/all-MiniLM-L6-v2 --file records.bin --delimiter '\0'
+npx @jsilvanus/embedeer --model onnx-community/gte-multilingual-base --file records.bin --delimiter '\0'
 
 # Integrate with find -print0 (handles filenames with spaces / newlines)
 find ./docs -name '*.txt' -print0 | \
   xargs -0 cat | \
-  npx @jsilvanus/embedeer --model Xenova/all-MiniLM-L6-v2 --delimiter '\0'
+  npx @jsilvanus/embedeer --model onnx-community/gte-multilingual-base --delimiter '\0'
 ```
 
 Supported escape sequences in `--delimiter`:
@@ -148,7 +148,7 @@ Use `--dump <path>` to write the output to a file instead of stdout. Progress me
 ### Piping examples
 
 ```bash
-MODEL=Xenova/all-MiniLM-L6-v2
+MODEL=onnx-community/gte-multilingual-base
 
 # --- json (default) ---
 # Embed and pretty-print with jq
@@ -206,26 +206,26 @@ find ./corpus -name '*.txt' -print0 \
 
 ```bash
 # Pull a model (like ollama pull)
-npx @jsilvanus/embedeer --model Xenova/all-MiniLM-L6-v2
+npx @jsilvanus/embedeer --model onnx-community/gte-multilingual-base
 
 # Embed a few strings, output JSON (CPU)
-npx @jsilvanus/embedeer --model Xenova/all-MiniLM-L6-v2 --data "Hello" "World"
+npx @jsilvanus/embedeer --model onnx-community/gte-multilingual-base --data "Hello" "World"
 
 # Auto-detect GPU, fall back to CPU if unavailable
 # (uses CUDA on Linux, DirectML on Windows, CPU everywhere else)
-npx @jsilvanus/embedeer --model Xenova/all-MiniLM-L6-v2 --device auto --data "Hello"
+npx @jsilvanus/embedeer --model onnx-community/gte-multilingual-base --device auto --data "Hello"
 
 # Require GPU (throws with install instructions if no provider found)
-npx @jsilvanus/embedeer --model Xenova/all-MiniLM-L6-v2 --device gpu --data "Hello GPU"
+npx @jsilvanus/embedeer --model onnx-community/gte-multilingual-base --device gpu --data "Hello GPU"
 
 # Explicit CUDA (Linux x64 — requires CUDA 12 system libraries)
-npx @jsilvanus/embedeer --model Xenova/all-MiniLM-L6-v2 --provider cuda --data "Hello CUDA"
+npx @jsilvanus/embedeer --model onnx-community/gte-multilingual-base --provider cuda --data "Hello CUDA"
 
 # Explicit DirectML (Windows x64)
-npx @jsilvanus/embedeer --model Xenova/all-MiniLM-L6-v2 --provider dml --data "Hello DML"
+npx @jsilvanus/embedeer --model onnx-community/gte-multilingual-base --provider dml --data "Hello DML"
 
 # Embed from a file, dump SQL to disk
-npx @jsilvanus/embedeer --model Xenova/all-MiniLM-L6-v2 \
+npx @jsilvanus/embedeer --model onnx-community/gte-multilingual-base \
   --file texts.txt --output sql --dump out.sql
 
 # Use quantized model, in-process threads, private model with token
@@ -248,19 +248,19 @@ bundles the CUDA provider on Linux x64 and DirectML on Windows x64.
 sudo apt install cuda-toolkit-12-6 libcudnn9-cuda-12
 
 # Auto-detect: uses CUDA here, CPU fallback on any other machine
-npx @jsilvanus/embedeer --model Xenova/all-MiniLM-L6-v2 --device auto --data "Hello"
+npx @jsilvanus/embedeer --model onnx-community/gte-multilingual-base --device auto --data "Hello"
 
 # Hard-require CUDA (throws with diagnostic error if unavailable):
-npx @jsilvanus/embedeer --model Xenova/all-MiniLM-L6-v2 --device gpu --data "Hello GPU"
+npx @jsilvanus/embedeer --model onnx-community/gte-multilingual-base --device gpu --data "Hello GPU"
 
 # Explicit CUDA provider:
-npx @jsilvanus/embedeer --model Xenova/all-MiniLM-L6-v2 --provider cuda --data "Hello CUDA"
+npx @jsilvanus/embedeer --model onnx-community/gte-multilingual-base --provider cuda --data "Hello CUDA"
 ```
 
 **Windows x64 — DirectML (any GPU: NVIDIA / AMD / Intel):**
 
 ```bash
-npx @jsilvanus/embedeer --model Xenova/all-MiniLM-L6-v2 --device auto --data "Hello"
-npx @jsilvanus/embedeer --model Xenova/all-MiniLM-L6-v2 --device gpu  --data "Hello GPU"
-npx @jsilvanus/embedeer --model Xenova/all-MiniLM-L6-v2 --provider dml --data "Hello DML"
+npx @jsilvanus/embedeer --model onnx-community/gte-multilingual-base --device auto --data "Hello"
+npx @jsilvanus/embedeer --model onnx-community/gte-multilingual-base --device gpu  --data "Hello GPU"
+npx @jsilvanus/embedeer --model onnx-community/gte-multilingual-base --provider dml --data "Hello DML"
 ```

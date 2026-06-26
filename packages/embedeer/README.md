@@ -75,7 +75,7 @@ In `process` and `thread` modes, each worker loads its own model copy — N work
 import { Embedder } from '@jsilvanus/embedeer';
 
 // The default is CPU embedder
-const embedder = await Embedder.create('Xenova/all-MiniLM-L6-v2', {
+const embedder = await Embedder.create('onnx-community/gte-multilingual-base', {
   batchSize:   32,          // texts per worker task   (default: 32)
   concurrency: 2,           // parallel workers        (default: 2)
   mode:       'process',    // 'process' | 'thread'    (default: 'process')
@@ -87,23 +87,23 @@ const embedder = await Embedder.create('Xenova/all-MiniLM-L6-v2', {
 });
 
 // OR: Auto-detect GPU (falls back to CPU if no provider is installed)
-const embedder = await Embedder.create('Xenova/all-MiniLM-L6-v2', {
+const embedder = await Embedder.create('onnx-community/gte-multilingual-base', {
   device: 'auto',
 });
 
 // OR: Require GPU (throws if no provider is available)
-const embedder = await Embedder.create('Xenova/all-MiniLM-L6-v2', {
+const embedder = await Embedder.create('onnx-community/gte-multilingual-base', {
   device: 'gpu',
 });
 
 // OR: Explicitly select an execution provider
-const embedder = await Embedder.create('Xenova/all-MiniLM-L6-v2', {
+const embedder = await Embedder.create('onnx-community/gte-multilingual-base', {
   provider: 'cuda',  // 'cuda' | 'dml'
 });
 
 // .embed is the way to get the embeddings.
 const vectors = await embedder.embed(['Hello world', 'Foo bar baz']);
-// → number[][]  (one 384-dim vector per text for all-MiniLM-L6-v2)
+// → number[][]  (one 768-dim vector per text for gte-multilingual-base)
 
 await embedder.destroy(); // shut down worker processes
 ```
@@ -113,7 +113,7 @@ await embedder.destroy(); // shut down worker processes
 Run one persistent model server shared across multiple OS processes. Any process that knows the socket path can connect — useful when several services on the same machine all need embeddings.
 
 ```bash
-# Start the daemon — default model (Xenova/all-MiniLM-L6-v2), CPU, no idle offload
+# Start the daemon — default model (onnx-community/gte-multilingual-base), CPU, no idle offload
 npm run daemon
 
 # Pass arguments after --
@@ -122,7 +122,7 @@ npm run daemon -- --model nomic-ai/nomic-embed-text-v1
 
 | Argument | Default | Description |
 |---|---|---|
-| `--model` | `Xenova/all-MiniLM-L6-v2` | Hugging Face model identifier |
+| `--model` | `onnx-community/gte-multilingual-base` | Hugging Face model identifier |
 | `--socket` | auto (`/tmp/embedeer-<model>.sock`) | Unix socket path |
 | `--pooling` | `mean` | `mean` \| `cls` \| `none` |
 | `--normalize` / `--no-normalize` | enabled | L2-normalise output vectors |
@@ -137,7 +137,7 @@ Connect from any number of processes:
 
 ```js
 // In process A (web server) and process B (background worker) — same API
-const embedder = await Embedder.create('Xenova/all-MiniLM-L6-v2', {
+const embedder = await Embedder.create('onnx-community/gte-multilingual-base', {
   mode: 'socket',
   socketPath: '/tmp/emb.sock',
   autoStartServer: false,   // daemon is already running
@@ -153,7 +153,7 @@ One model in RAM serves all connected processes. `autoStartServer: true` (the de
 Run the model as a gRPC service (HTTP/2 + Protocol Buffers). Works locally or over a network.
 
 ```bash
-# Start the server — default model (Xenova/all-MiniLM-L6-v2), localhost:50051
+# Start the server — default model (onnx-community/gte-multilingual-base), localhost:50051
 npm run server
 
 # Pass arguments after --
@@ -162,7 +162,7 @@ npm run server -- --address 0.0.0.0:50051        # listen on all interfaces
 
 | Argument | Default | Description |
 |---|---|---|
-| `--model` | `Xenova/all-MiniLM-L6-v2` | Hugging Face model identifier |
+| `--model` | `onnx-community/gte-multilingual-base` | Hugging Face model identifier |
 | `--address` | `localhost:50051` | Bind address (`host:port`) |
 | `--pooling` | `mean` | `mean` \| `cls` \| `none` |
 | `--normalize` / `--no-normalize` | enabled | L2-normalise output vectors |
@@ -177,13 +177,13 @@ Connect from Node.js using this package's client:
 
 ```js
 // Auto-start a local server (dies with process) and you can then send it data
-const embedder = await Embedder.create('Xenova/all-MiniLM-L6-v2', {
+const embedder = await Embedder.create('onnx-community/gte-multilingual-base', {
   mode: 'grpc',
   grpcAddress: 'localhost:50051',
 });
 
 // Connect this client into a remote server
-const embedder = await Embedder.create('Xenova/all-MiniLM-L6-v2', {
+const embedder = await Embedder.create('onnx-community/gte-multilingual-base', {
   mode: 'grpc',
   grpcAddress: '10.0.1.42:50051',
   autoStartServer: false,
@@ -198,7 +198,7 @@ await embedder.destroy();
 Point a WorkerPool at multiple servers. The idle-worker queue acts as a natural load balancer — workers on faster servers (GPU) finish sooner and pick up proportionally more tasks.
 
 ```js
-const embedder = await Embedder.create('Xenova/all-MiniLM-L6-v2', {
+const embedder = await Embedder.create('onnx-community/gte-multilingual-base', {
   mode: 'grpc',               // or 'socket'
   dtype: 'fp16',              // uniform across all servers
   servers: [
@@ -225,7 +225,7 @@ Embedeer runs models via `onnxruntime-node`. Models chosen from Hugging Face mus
 
 Embedeer supports pre-caching and managing downloaded models.
 
-- Pull (pre-cache) a model via the CLI: `npx @jsilvanus/embedeer --model Xenova/all-MiniLM-L6-v2`
+- Pull (pre-cache) a model via the CLI: `npx @jsilvanus/embedeer --model onnx-community/gte-multilingual-base`
 - Programmatic pre-cache using `loadModel()`
 - Cache location: default is `~/.embedeer/models`. Override with the CLI `--cache-dir` option or the `cacheDir` argument to `loadModel()`.
 
@@ -335,14 +335,14 @@ Compare socket and gRPC server throughput against the process/thread baseline:
 ```bash
 npm run server-bench
 # or with options:
-node bench/server-bench.js --model Xenova/all-MiniLM-L6-v2 --batch-size 32 --sample-size 500
+node bench/server-bench.js --model onnx-community/gte-multilingual-base --batch-size 32 --sample-size 500
 ```
 
 The benchmark starts each server as a subprocess, waits for it to load the model, runs embeddings, then shuts it down. Reports startup time (spawn → ready) separately from embedding throughput so you can see the fixed cost of model loading vs. steady-state performance.
 
 ```
 Options:
-  --model       <name>   HF model identifier  (default: Xenova/all-MiniLM-L6-v2)
+  --model       <name>   HF model identifier  (default: onnx-community/gte-multilingual-base)
   --batch-size  <n>      Texts per request     (default: 32)
   --dtype       <type>   Quantization dtype    (default: none)
   --sample-size <n>      Number of texts       (default: 200)

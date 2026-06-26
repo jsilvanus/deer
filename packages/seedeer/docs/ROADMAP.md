@@ -20,7 +20,7 @@ pipeline (batch in, vectors out, no streaming, no generation).
 
 - `JointEmbedder` (CLIP/SigLIP-class) — `embedImages()`, `embedText()`,
   both landing in the same vector space.
-- `VisualEmbedder` (DINOv2-class) — `embedImages()` only.
+- `VisualEmbedder` (DINOv3-class) — `embedImages()` only.
 - Reuse/adapt embedeer's `worker-pool.js` and `provider-loader.js` for
   image tensors.
 - `process`/`thread`/`socket`/`grpc` modes, mirroring embedeer exactly.
@@ -47,7 +47,7 @@ pipeline (batch in, vectors out, no streaming, no generation).
 
 Highest risk, done last, after the request/response patterns are proven.
 
-- `Detector` — per-frame bounding boxes (YOLOS-tiny-class ONNX model via
+- `Detector` — per-frame bounding boxes (RT-DETR-class ONNX model via
   the generic object-detection pipeline, filtered to a configurable
   label, default `'person'`).
 - `Tracker` — assigns persistent IDs across frames on top of `Detector`
