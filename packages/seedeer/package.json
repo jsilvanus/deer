@@ -1,6 +1,6 @@
 {
   "name": "@jsilvanus/seedeer",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "A Node.js vision-model toolkit: detection/tracking with zone triggers, visual question answering, captioning, and image embeddings (joint and vision-only), importable directly with no HTTP required.",
   "type": "module",
   "main": "src/index.js",

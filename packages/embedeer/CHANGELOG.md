@@ -1,5 +1,32 @@
 # @jsilvanus/embedeer
 
+## 1.9.0
+
+### Minor Changes
+
+- a3b42c0: Update default models to more contemporary alternatives:
+
+  - `embedeer`: default embedding model is now `onnx-community/gte-multilingual-base` (768-dim, multilingual GTE) instead of the 2021-era `Xenova/all-MiniLM-L6-v2`. Also fixes an existing bug where the `Embedder` constructor's fallback model name (`nomic-embed-text`) was not a valid Hugging Face repo id.
+  - `seedeer`: `Detector`'s default model is now `onnx-community/rtdetr_r18vd` (RT-DETR) instead of `Xenova/yolos-tiny`. `VisualEmbedder` examples/benchmarks now use DINOv3 (`onnx-community/dinov3-vit{s,b}16-pretrain-lvd1689m-ONNX`) instead of DINOv2.
+
+  These are drop-in replacements using the same pipeline/model-class APIs. `Captioner` (BLIP/Florence-2 alternatives aren't simple drop-ins for the `image-to-text` pipeline) and `JointEmbedder` (switching CLIP to SigLIP requires different model classes) were left unchanged — flagged separately for a follow-up.
+
+### Patch Changes
+
+- 0327647: Fix markdown links pointing to old standalone-repo GitHub orgs; point them at the monorepo (`jsilvanus/deer`) instead.
+- 0029dc3: Refactor embedeer to use nudeer's generic WorkerPool abstraction, eliminating ~1575 lines of duplicate pool orchestration code. The public API remains unchanged; only internal implementation details are affected. embedeer now follows the same architecture pattern as seedeer.
+- 6499111: Unify GPU provider resolution across all packages via nudeer.
+
+  **nudeer:** Export sophisticated `resolveProvider(device, provider)` with CUDA library verification, ldconfig caching, and detailed error messages. Replaces simple `resolveDevice` to provide production-quality GPU detection.
+
+  **embedeer & seedeer:** Refactor to import `resolveProvider` from nudeer. All packages now use the same CUDA detection logic with library verification and helpful installation instructions. No public API changes.
+
+  Consolidates provider detection code, eliminating 3 duplicate implementations.
+
+- Updated dependencies [0327647]
+- Updated dependencies [6499111]
+  - @jsilvanus/nudeer@0.2.0
+
 ## 1.8.0
 
 ### Minor Changes
