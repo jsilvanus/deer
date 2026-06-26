@@ -17,7 +17,7 @@
  *   cat big.txt | embedeer --model <name> --interactive --output csv --dump out.csv
  *
  * Options:
- *   -m, --model <name>           Hugging Face model (default: nomic-embed-text)
+ *   -m, --model <name>           Hugging Face model (default: onnx-community/gte-multilingual-base)
  *   -d, --data <text...>         Text(s) to embed (JSON array or individual strings)
  *       --file <path>            File of texts (JSON array or one text per line)
  *   -D, --delimiter <str>        Record separator for stdin/file input (default: \n)
@@ -70,7 +70,7 @@ Interactive / streaming line-reader:
   cat big.txt | embedeer --model <name> -i --output csv --dump out.csv
 
 Options:
-  -m, --model <name>           Hugging Face model (default: nomic-embed-text)
+  -m, --model <name>           Hugging Face model (default: onnx-community/gte-multilingual-base)
   -d, --data <text...>         Text(s) or JSON array to embed
       --file <path>            Input file: JSON array or delimited texts
   -D, --delimiter <str>        Record separator for stdin/file (default: \\n)
@@ -110,7 +110,7 @@ const KNOWN_FLAGS = new Set([
   '--load-local', '--use-local',
 ]);
 const options = {
-  model: 'nomic-embed-text',
+  model: 'onnx-community/gte-multilingual-base',
   data: null,         // --data texts (array)
   file: null,         // --file path
   delimiter: '\n',    // --delimiter record separator for stdin/file

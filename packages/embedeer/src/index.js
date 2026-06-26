@@ -4,13 +4,13 @@
  * @example
  * import { Embedder } from 'embedeer';
  *
- * const embedder = await Embedder.create('Xenova/all-MiniLM-L6-v2');
+ * const embedder = await Embedder.create('onnx-community/gte-multilingual-base');
  * const vectors = await embedder.embed(['Hello', 'World']);
  * await embedder.destroy();
  *
  * @example — pre-pull a model (like `ollama pull`)
  * import { loadModel } from 'embedeer';
- * await loadModel('Xenova/all-MiniLM-L6-v2');
+ * await loadModel('onnx-community/gte-multilingual-base');
  */
 
 export { Embedder } from './embedder.js';

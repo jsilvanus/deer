@@ -300,12 +300,12 @@ rejects only its in-flight task; the pool keeps running.
 import { Embedder } from 'embedeer';
 
 // Defaults: mode='process', concurrency=numCores, batchSize=32
-const embedder = await Embedder.create('Xenova/all-MiniLM-L6-v2');
+const embedder = await Embedder.create('onnx-community/gte-multilingual-base');
 const vectors = await embedder.embed(['Hello world', 'Foo bar']);
 await embedder.destroy();
 
 // Explicit options
-const embedder = await Embedder.create('Xenova/all-MiniLM-L6-v2', {
+const embedder = await Embedder.create('onnx-community/gte-multilingual-base', {
   mode: 'process',
   concurrency: 4,
   batchSize: 32,
@@ -323,7 +323,7 @@ Workers are `worker_threads` threads. Lower startup time and memory overhead;
 a thread crash can propagate to the parent. Use in trusted environments.
 
 ```js
-const embedder = await Embedder.create('Xenova/all-MiniLM-L6-v2', {
+const embedder = await Embedder.create('onnx-community/gte-multilingual-base', {
   mode: 'thread',
   concurrency: 4,
   batchSize: 32,
@@ -340,21 +340,21 @@ processes connect to it by socket path. One model copy serves them all.
 ```bash
 # Start the daemon once (e.g. on machine boot / in a tmux pane)
 node src/socket-model-server.js \
-  --model Xenova/all-MiniLM-L6-v2 \
+  --model onnx-community/gte-multilingual-base \
   --socket /tmp/embedeer.sock \
   --dtype fp16
 ```
 
 ```js
 // process-a.js — web server
-const embedder = await Embedder.create('Xenova/all-MiniLM-L6-v2', {
+const embedder = await Embedder.create('onnx-community/gte-multilingual-base', {
   mode: 'socket',
   socketPath: '/tmp/embedeer.sock',
   autoStartServer: false,
 });
 
 // process-b.js — background worker (separate OS process, same machine)
-const embedder = await Embedder.create('Xenova/all-MiniLM-L6-v2', {
+const embedder = await Embedder.create('onnx-community/gte-multilingual-base', {
   mode: 'socket',
   socketPath: '/tmp/embedeer.sock',
   autoStartServer: false,
@@ -372,7 +372,7 @@ One process owns and manages the server. `WorkerPool` spawns it on
 but does not survive `embedder.destroy()`.
 
 ```js
-const embedder = await Embedder.create('Xenova/all-MiniLM-L6-v2', {
+const embedder = await Embedder.create('onnx-community/gte-multilingual-base', {
   mode: 'socket',
   concurrency: 4,
   socketPath: '/tmp/embedeer-main.sock',  // omit to auto-generate
@@ -391,14 +391,14 @@ model is large and you want zero reload cost across multiple short-lived runs.
 
 ```js
 // First run — server starts, model loads
-const e1 = await Embedder.create('Xenova/all-MiniLM-L6-v2', {
+const e1 = await Embedder.create('onnx-community/gte-multilingual-base', {
   mode: 'socket', socketPath: '/tmp/embedeer.sock', autoStartServer: true,
 });
 await e1.embed([...]);
 await e1.destroy();   // closes connections; server keeps running
 
 // Second run — connects instantly, no model reload
-const e2 = await Embedder.create('Xenova/all-MiniLM-L6-v2', {
+const e2 = await Embedder.create('onnx-community/gte-multilingual-base', {
   mode: 'socket', socketPath: '/tmp/embedeer.sock', autoStartServer: false,
 });
 ```
@@ -408,7 +408,7 @@ const e2 = await Embedder.create('Xenova/all-MiniLM-L6-v2', {
 ### `'socket'` — legacy: single server, pre-running (manual start)
 
 // Terminal 2 — connect:
-const embedder = await Embedder.create('Xenova/all-MiniLM-L6-v2', {
+const embedder = await Embedder.create('onnx-community/gte-multilingual-base', {
   mode: 'socket',
   socketPath: '/tmp/embedeer-main.sock',
   autoStartServer: false,   // do not spawn; connect to running server
@@ -425,7 +425,7 @@ creates the specified number of workers per server. All workers share one
 `idleWorkers` queue.
 
 ```js
-const embedder = await Embedder.create('Xenova/all-MiniLM-L6-v2', {
+const embedder = await Embedder.create('onnx-community/gte-multilingual-base', {
   mode: 'socket',
   dtype: 'fp16',         // uniform — all servers load the same quantization
   pooling: 'mean',       // uniform
@@ -445,7 +445,7 @@ const embedder = await Embedder.create('Xenova/all-MiniLM-L6-v2', {
 ### `'socket'` — multiple servers, pre-running
 
 ```js
-const embedder = await Embedder.create('Xenova/all-MiniLM-L6-v2', {
+const embedder = await Embedder.create('onnx-community/gte-multilingual-base', {
   mode: 'socket',
   autoStartServer: false,
   servers: [

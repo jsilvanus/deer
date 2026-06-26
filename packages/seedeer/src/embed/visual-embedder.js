@@ -4,7 +4,7 @@ import { chunk } from '../shared/chunk.js';
 const ENGINE_PATH = new URL('./embed-engine.js', import.meta.url).href;
 
 /**
- * Vision-only embedder (DINOv2-class models). Not comparable to text
+ * Vision-only embedder (DINOv3-class models). Not comparable to text
  * embeddings — for image-to-image similarity, clustering, and
  * near-duplicate detection. See docs/features/embeddings.md.
  */

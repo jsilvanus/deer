@@ -11,7 +11,7 @@
  *   node bench/server-bench.js [options]
  *
  * Options:
- *   --model       <name>    HF model identifier (default: Xenova/all-MiniLM-L6-v2)
+ *   --model       <name>    HF model identifier (default: onnx-community/gte-multilingual-base)
  *   --batch-size  <n>       Texts per request   (default: 32)
  *   --dtype       <type>    Quantization dtype  (default: none)
  *   --sample-size <n>       Number of texts to embed (default: 200, max: 1000)
@@ -39,7 +39,7 @@ const PROTO_PATH = join(SRC_DIR, 'proto', 'embedder.proto');
 
 const argv = process.argv.slice(2);
 const opts = {
-  model:        'Xenova/all-MiniLM-L6-v2',
+  model:        'onnx-community/gte-multilingual-base',
   batchSize:    32,
   dtype:        undefined,
   sampleSize:   200,

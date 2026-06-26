@@ -415,12 +415,12 @@ only its in-flight task; the pool keeps running.
 import { Embedder } from 'embedeer';
 
 // Defaults: mode='process', concurrency=numCores, batchSize=32
-const embedder = await Embedder.create('Xenova/all-MiniLM-L6-v2');
+const embedder = await Embedder.create('onnx-community/gte-multilingual-base');
 const vectors = await embedder.embed(['Hello world', 'Foo bar']);
 await embedder.destroy();
 
 // Explicit options
-const embedder = await Embedder.create('Xenova/all-MiniLM-L6-v2', {
+const embedder = await Embedder.create('onnx-community/gte-multilingual-base', {
   mode: 'process',
   concurrency: 4,
   batchSize: 32,
@@ -438,7 +438,7 @@ Workers are `worker_threads` threads. Lower startup time and memory vs
 `'process'`; a thread crash can propagate to the parent.
 
 ```js
-const embedder = await Embedder.create('Xenova/all-MiniLM-L6-v2', {
+const embedder = await Embedder.create('onnx-community/gte-multilingual-base', {
   mode: 'thread',
   concurrency: 4,
   batchSize: 32,
@@ -453,7 +453,7 @@ const embedder = await Embedder.create('Xenova/all-MiniLM-L6-v2', {
 then opens `concurrency` gRPC channels to it.
 
 ```js
-const embedder = await Embedder.create('Xenova/all-MiniLM-L6-v2', {
+const embedder = await Embedder.create('onnx-community/gte-multilingual-base', {
   mode: 'grpc',
   concurrency: 4,
   grpcAddress: 'localhost:50051',   // omit to use default port
@@ -473,10 +473,10 @@ or for connecting to a Python-based model server.
 ```js
 // Terminal 1:
 // node src/grpc-model-server.js \
-//   --model Xenova/all-MiniLM-L6-v2 --address localhost:50051
+//   --model onnx-community/gte-multilingual-base --address localhost:50051
 
 // Terminal 2:
-const embedder = await Embedder.create('Xenova/all-MiniLM-L6-v2', {
+const embedder = await Embedder.create('onnx-community/gte-multilingual-base', {
   mode: 'grpc',
   grpcAddress: 'localhost:50051',
   autoStartServer: false,
@@ -491,7 +491,7 @@ const embedder = await Embedder.create('Xenova/all-MiniLM-L6-v2', {
 The server runs on another machine; the API is identical to local.
 
 ```js
-const embedder = await Embedder.create('Xenova/all-MiniLM-L6-v2', {
+const embedder = await Embedder.create('onnx-community/gte-multilingual-base', {
   mode: 'grpc',
   grpcAddress: '10.0.1.42:50051',
   autoStartServer: false,
@@ -507,7 +507,7 @@ const embedder = await Embedder.create('Xenova/all-MiniLM-L6-v2', {
 `workers` count and all share one `idleWorkers` queue.
 
 ```js
-const embedder = await Embedder.create('Xenova/all-MiniLM-L6-v2', {
+const embedder = await Embedder.create('onnx-community/gte-multilingual-base', {
   mode: 'grpc',
   dtype: 'fp16',        // uniform — all servers load the same quantization
   pooling: 'mean',      // uniform
@@ -527,7 +527,7 @@ const embedder = await Embedder.create('Xenova/all-MiniLM-L6-v2', {
 ### `'grpc'` — multiple servers, pre-running (heterogeneous)
 
 ```js
-const embedder = await Embedder.create('Xenova/all-MiniLM-L6-v2', {
+const embedder = await Embedder.create('onnx-community/gte-multilingual-base', {
   mode: 'grpc',
   autoStartServer: false,
   servers: [
@@ -546,7 +546,7 @@ For identically-configured servers, use gRPC's built-in `round_robin` policy.
 Servers must be started separately; auto-start is not supported in this mode.
 
 ```js
-const embedder = await Embedder.create('Xenova/all-MiniLM-L6-v2', {
+const embedder = await Embedder.create('onnx-community/gte-multilingual-base', {
   mode: 'grpc',
   grpcAddress: 'ipv4:///localhost:50051,localhost:50052,localhost:50053',
   grpcLoadBalancing: 'round_robin',

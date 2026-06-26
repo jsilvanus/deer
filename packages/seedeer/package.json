@@ -42,7 +42,7 @@
   },
   "dependencies": {
     "@jsilvanus/nudeer": "workspace:*",
-    "@huggingface/transformers": "^3.0.0",
+    "@huggingface/transformers": "^4.0.1",
     "onnxruntime-node": "^1.19.0"
   },
   "optionalDependencies": {

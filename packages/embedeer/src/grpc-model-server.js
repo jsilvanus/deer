@@ -44,7 +44,7 @@ const PROTO_PATH = join(dirname(fileURLToPath(import.meta.url)), 'proto', 'embed
 const { values: args } = parseArgs({
   args: process.argv.slice(2),
   options: {
-    model:          { type: 'string',  default: 'Xenova/all-MiniLM-L6-v2' },
+    model:          { type: 'string',  default: 'onnx-community/gte-multilingual-base' },
     address:        { type: 'string',  default: 'localhost:50051' },
     pooling:        { type: 'string',  default: 'mean' },
     normalize:      { type: 'boolean', default: true },

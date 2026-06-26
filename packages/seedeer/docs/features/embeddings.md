@@ -26,8 +26,8 @@ const textVecs  = await joint.embedText(['a photo of a dog', ...]);
 
 await joint.destroy();
 
-// Vision-only space (DINOv2-class) — image-to-image similarity only
-const visual = await VisualEmbedder.create('Xenova/dinov2-base', {
+// Vision-only space (DINOv3-class) — image-to-image similarity only
+const visual = await VisualEmbedder.create('onnx-community/dinov3-vitb16-pretrain-lvd1689m-ONNX', {
   mode: 'process',
 });
 const vecs = await visual.embedImages([imagePathOrBuffer, ...]);

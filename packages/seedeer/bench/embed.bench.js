@@ -11,7 +11,7 @@ await bench('JointEmbedder.embedImages (1 image)', () => joint.embedImages([CAT_
 await bench('JointEmbedder.embedText (1 text)', () => joint.embedText(['a photo of a cat']));
 await joint.destroy();
 
-const visual = await VisualEmbedder.create('Xenova/dinov2-small', {
+const visual = await VisualEmbedder.create('onnx-community/dinov3-vits16-pretrain-lvd1689m-ONNX', {
   mode: 'process',
   concurrency: 1,
 });
