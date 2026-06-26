@@ -4,7 +4,7 @@
 
 ## A Node.js chat completions toolkit
 
-A Node.js LLM chat toolkit built on top of [@jsilvanus/embedeer](https://github.com/jsilvanus/embedeer).
+A Node.js LLM chat toolkit built on top of [@jsilvanus/embedeer](https://github.com/jsilvanus/deer/tree/main/packages/embedeer).
 
 Provides `Explainer`, `LLMAdapter`, `ChatSession`, prompt utilities, and higher-level agentic helpers for multi-turn tool-calling.
 New additions include `createChatProvider`, `runAgentLoop`, and `createOpenAiChatHandler` (OpenAI `/v1/chat/completions` handler).

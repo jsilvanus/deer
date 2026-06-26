@@ -6,7 +6,7 @@
 
 [![npm version](https://img.shields.io/npm/v/@jsilvanus/embedeer.svg)](https://www.npmjs.com/package/@jsilvanus/embedeer)
 [![npm downloads](https://img.shields.io/npm/dm/@jsilvanus/embedeer.svg?label=downloads)](https://www.npmjs.com/package/@jsilvanus/embedeer)
-[![release downloads](https://img.shields.io/github/downloads/jsilvanus/embedeer/total.svg?label=downloads)](https://github.com/jsilvanus/embedeer/releases)
+[![release downloads](https://img.shields.io/github/downloads/jsilvanus/deer/total.svg?label=downloads)](https://github.com/jsilvanus/deer/releases)
 
 A Node.js tool for generating text embeddings using [transformers.js](https://github.com/huggingface/transformers.js) with ONNX models from [Hugging Face](https://huggingface.co/models).
 
