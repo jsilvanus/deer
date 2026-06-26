@@ -34,7 +34,6 @@ export class LLMAdapter {
     env.cacheDir = resolvedCache;
 
     if (useWorkerPool) {
-      const { resolveProvider } = await import('@jsilvanus/embedeer/src/provider-loader.js');
       const __dirname = dirname(fileURLToPath(import.meta.url));
       const workerScript = join(__dirname, 'worker-gen.js');
       const threadWorkerScript = join(__dirname, 'thread-worker-gen-script.js');
@@ -62,7 +61,7 @@ export class LLMAdapter {
       return adapter;
     }
 
-    const { resolveProvider } = await import('@jsilvanus/embedeer/src/provider-loader.js');
+    const { resolveProvider } = await import('@jsilvanus/nudeer');
     const deviceStr = await resolveProvider(device, provider);
     const pipelineOpts = {
       ...buildPipelineOptions(dtype),

@@ -52,7 +52,8 @@
   },
   "dependencies": {
     "@huggingface/transformers": "^4.0.1",
-    "@jsilvanus/embedeer": "workspace:*"
+    "@jsilvanus/embedeer": "workspace:*",
+    "@jsilvanus/nudeer": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^20.8.0",
