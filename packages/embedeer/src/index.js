@@ -36,4 +36,4 @@ export { isModelDownloaded, listModels, downloadModel, prepareModel, ensureModel
 export { getLoadedModels, registerLoadedModel, unregisterLoadedModel } from './runtime-models.js'
 
 // Provider resolution (used by chattydeer and other packages that build on embedeer)
-export { resolveProvider } from './provider-loader.js'
+export { resolveProvider } from '@jsilvanus/nudeer'

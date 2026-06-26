@@ -1,4 +1,4 @@
-import { resolveDevice, defaultCacheDir } from '@jsilvanus/nudeer';
+import { resolveProvider, defaultCacheDir } from '@jsilvanus/nudeer';
 import { loadRawImage } from '../shared/image-input.js';
 
 /**
@@ -16,7 +16,7 @@ export async function createEngine({ kind, modelName, device, provider, cacheDir
 async function createJointEngine({ modelName, device, provider, cacheDir, dtype }) {
   const { CLIPTextModelWithProjection, CLIPVisionModelWithProjection, AutoTokenizer, AutoProcessor } =
     await import('@huggingface/transformers');
-  const resolvedDevice = resolveDevice({ device, provider });
+  const resolvedDevice = await resolveProvider(device, provider);
   const cache_dir = cacheDir ?? defaultCacheDir('seedeer');
   const pretrainedOptions = { cache_dir, device: resolvedDevice, dtype: dtype ?? 'fp32' };
 
@@ -50,7 +50,7 @@ async function createJointEngine({ modelName, device, provider, cacheDir, dtype 
 
 async function createVisualEngine({ modelName, device, provider, cacheDir, dtype }) {
   const { AutoProcessor, AutoModel } = await import('@huggingface/transformers');
-  const resolvedDevice = resolveDevice({ device, provider });
+  const resolvedDevice = await resolveProvider(device, provider);
   const cache_dir = cacheDir ?? defaultCacheDir('seedeer');
   const pretrainedOptions = { cache_dir, device: resolvedDevice, dtype: dtype ?? 'fp32' };
 

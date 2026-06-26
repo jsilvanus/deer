@@ -26,6 +26,9 @@ importers:
       '@jsilvanus/embedeer':
         specifier: workspace:*
         version: link:../embedeer
+      '@jsilvanus/nudeer':
+        specifier: workspace:*
+        version: link:../nudeer
     devDependencies:
       '@types/node':
         specifier: ^20.8.0
@@ -42,6 +45,9 @@ importers:
       '@huggingface/transformers':
         specifier: ^4.0.1
         version: 4.2.0
+      '@jsilvanus/nudeer':
+        specifier: workspace:*
+        version: link:../nudeer
     devDependencies:
       '@types/node':
         specifier: ^25.5.2

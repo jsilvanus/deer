@@ -1,6 +1,6 @@
 import { pipeline, env } from '@huggingface/transformers';
+import { resolveProvider } from '@jsilvanus/nudeer';
 import { buildPipelineOptions } from './model-cache.js';
-import { resolveProvider } from './provider-loader.js';
 
 export async function createEngine(options) {
   const { modelName, pooling, normalize, token, dtype, cacheDir, device, provider } = options;
