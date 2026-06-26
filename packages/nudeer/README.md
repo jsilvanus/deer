@@ -6,7 +6,7 @@ Generic worker pool and model server infrastructure for Node.js model serving ap
 
 **nudeer** (nude + deer = just the core) provides a reusable WorkerPool abstraction that supports multiple execution modes — process isolation, worker threads, Unix sockets, and gRPC — without tying application code to any one transport.
 
-It's the foundation for [`@jsilvanus/embedeer`](https://github.com/jsilvanus/deer) (text embeddings), [`@jsilvanus/seedeer`](https://github.com/jsilvanus/deer) (vision), and can be used to build model servers for any task.
+It's the foundation for [`@jsilvanus/embedeer`](https://github.com/jsilvanus/deer/tree/main/packages/embedeer) (text embeddings), [`@jsilvanus/seedeer`](https://github.com/jsilvanus/deer/tree/main/packages/seedeer) (vision), and can be used to build model servers for any task.
 
 ## Features
 

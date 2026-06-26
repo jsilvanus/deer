@@ -2,8 +2,8 @@
 
 ## What this project is
 
-seedeer is the vision counterpart to [`@jsilvanus/embedeer`](https://github.com/jsilvanus/embedeer)
-(local text embeddings) and [`@jsilvanus/chattydeer`](https://github.com/jsilvanus/chattydeer)
+seedeer is the vision counterpart to [`@jsilvanus/embedeer`](https://github.com/jsilvanus/deer/tree/main/packages/embedeer)
+(local text embeddings) and [`@jsilvanus/chattydeer`](https://github.com/jsilvanus/deer/tree/main/packages/chattydeer)
 (LLM chat/agentic toolkit). It provides vision-model functionality —
 detection/tracking, visual question answering, captioning, and image
 embeddings — as a directly importable ESM library, not an HTTP service.
