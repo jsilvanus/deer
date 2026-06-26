@@ -4,25 +4,7 @@
 
 import { test, describe, mock } from 'node:test';
 import assert from 'node:assert/strict';
-
-// ── Stub WorkerPool ──────────────────────────────────────────────────────────
-
-function makeStubPool(overrides = {}) {
-  return {
-    _initialized: true,
-    initialize: mock.fn(async () => {}),
-    run: mock.fn(async (texts) => texts.map(() => [0])),
-    destroy: mock.fn(async () => {}),
-    ...overrides,
-  };
-}
-
-async function makeEmbedder(stubPool, modelName = 'test', options = {}) {
-  const { Embedder } = await import('../src/embedder.js');
-  const e = new Embedder(modelName, options);
-  e._pool = stubPool;
-  return e;
-}
+import { makeStubPool, makeEmbedder } from './helpers.js';
 
 // ── Tests ────────────────────────────────────────────────────────────────────
 

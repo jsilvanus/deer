@@ -19,10 +19,8 @@ import { getCacheDir, buildPipelineOptions } from './model-cache.js';
 import os from 'os';
 import fs from 'fs';
 import { join } from 'path';
-import { fileURLToPath } from 'url';
 import childProcess from 'child_process';
 
-const __dirname = new URL('.', import.meta.url).pathname;
 const ENGINE_PATH = new URL('./embedding-engine.js', import.meta.url).href;
 
 export class Embedder {
