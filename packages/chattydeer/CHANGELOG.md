@@ -1,5 +1,17 @@
 # @jsilvanus/chattydeer
 
+## 0.5.1
+
+### Patch Changes
+
+- 0327647: Fix markdown links pointing to old standalone-repo GitHub orgs; point them at the monorepo (`jsilvanus/deer`) instead.
+- Updated dependencies [a3b42c0]
+- Updated dependencies [0327647]
+- Updated dependencies [0029dc3]
+- Updated dependencies [6499111]
+  - @jsilvanus/embedeer@1.9.0
+  - @jsilvanus/nudeer@0.2.0
+
 ## 0.5.0
 
 ### Minor Changes
