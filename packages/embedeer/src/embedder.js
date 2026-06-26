@@ -14,12 +14,14 @@
  */
 
 import { pipeline, env } from '@huggingface/transformers';
-import { WorkerPool } from './worker-pool.js';
+import { WorkerPool } from '@jsilvanus/nudeer';
 import { getCacheDir, buildPipelineOptions } from './model-cache.js';
 import os from 'os';
 import fs from 'fs';
 import { join } from 'path';
 import childProcess from 'child_process';
+
+const ENGINE_PATH = new URL('./embedding-engine.js', import.meta.url).href;
 
 export class Embedder {
   /**
@@ -58,16 +60,19 @@ export class Embedder {
     // Default provider selection for GPU if not provided
     const provider = options.provider ?? (device === 'gpu' ? (process.platform === 'win32' ? 'dml' : 'cuda') : undefined);
 
-    this._pool = new WorkerPool(modelName, {
-      poolSize: concurrency,
+    this._pool = new WorkerPool(ENGINE_PATH, {
       mode: options.mode ?? 'process',
-      pooling: options.pooling ?? 'mean',
-      normalize: options.normalize ?? true,
-      token: options.token,
-      dtype: options.dtype,
-      cacheDir: options.cacheDir ?? getCacheDir(),
-      device,
-      provider,
+      concurrency,
+      engineOptions: {
+        modelName,
+        pooling: options.pooling ?? 'mean',
+        normalize: options.normalize ?? true,
+        token: options.token,
+        dtype: options.dtype,
+        cacheDir: options.cacheDir ?? getCacheDir(),
+        device,
+        provider,
+      },
     });
   }
 
