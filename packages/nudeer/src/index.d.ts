@@ -42,7 +42,7 @@ export declare function defaultGrpcTarget(): string;
 
 export declare function defaultCacheDir(appName?: string): string;
 
-export declare function resolveDevice(options?: {
-  device?: 'cpu' | 'gpu' | 'auto';
-  provider?: 'cpu' | 'cuda' | 'dml';
-}): string;
+export declare function resolveProvider(
+  device?: 'auto' | 'cpu' | 'gpu',
+  provider?: 'cpu' | 'cuda' | 'dml'
+): Promise<string | undefined>;
